@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
-from ..database import get_db
-from ..models import Veiculo, Cliente, Locacao, StatusVeiculo, StatusLocacao
-from ..schemas import DashboardStats
-from ..auth import verificar_token
+from database.database import get_db
+from ..models.models import Veiculo, Cliente, Locacao, StatusVeiculo, StatusLocacao
+from ..schemas.user import DashboardStats
+from .auth import verificar_token
 
 router = APIRouter()
 

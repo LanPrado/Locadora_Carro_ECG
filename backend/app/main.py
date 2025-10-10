@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database import engine, Base, SessionLocal
-from .Routers import auth, veiculos, clientes, locacoes, dashboard
-import uvicorn
+# Mantenha os imports relativos agora que teremos um pacote
+from backend.app.database import engine, Base, SessionLocal
+from .routes import auth, veiculos, clientes, locacoes, dashboard 
 
 # Criar tabelas no banco
 Base.metadata.create_all(bind=engine)
@@ -41,7 +41,4 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "service": "loadora-backend"}
-
-if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    return {"status": "healthy", "service": "locadora-backend"}

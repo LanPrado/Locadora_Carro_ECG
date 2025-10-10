@@ -1,12 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-
-#importações necessárias
-from ..database import get_db
-from ..models import Veiculo, StatusVeiculo
-from ..schemas import VeiculoCreate, VeiculoResponse
-from ..auth import verificar_token
+from database.database import get_db
+from ..models.models import Veiculo, StatusVeiculo
+from ..schemas.user import VeiculoCreate, VeiculoResponse
 
 router = APIRouter()
 
@@ -14,7 +11,7 @@ router = APIRouter()
 def criar_veiculo(
     veiculo: VeiculoCreate,
     db: Session = Depends(get_db),
-    usuario_email: str = Depends(verificar_token)
+    #usuario_email: str = Depends(verificar_token)
 ):
     db_veiculo = db.query(Veiculo).filter(Veiculo.placa == veiculo.placa).first()
     if db_veiculo:
@@ -55,7 +52,7 @@ def atualizar_veiculo(
     veiculo_id: int,
     veiculo: VeiculoCreate,
     db: Session = Depends(get_db),
-    usuario_email: str = Depends(verificar_token)
+   # usuario_email: str = Depends(verificar_token)
 ):
     db_veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not db_veiculo:
@@ -73,7 +70,7 @@ def atualizar_veiculo(
 def deletar_veiculo(
     veiculo_id: int,
     db: Session = Depends(get_db),
-    usuario_email: str = Depends(verificar_token)
+   # usuario_email: str = Depends(verificar_token)
 ):
     veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not veiculo:

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from .database import Base
+from database.database import Base
 from datetime import datetime
 import enum
 
@@ -20,16 +20,6 @@ class StatusLocacao(enum.Enum):
     ATIVA = "ativa"
     FINALIZADA = "finalizada"
     CANCELADA = "cancelada"
-
-class Usuario(Base):
-    __tablename__ = "usuarios"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    nome = Column(String)
-    senha_hash = Column(String)
-    ativo = Column(Boolean, default=True)
-    criado_em = Column(DateTime, default=datetime.utcnow)
 
 class Veiculo(Base):
     __tablename__ = "veiculos"
