@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from database.database import get_db
+from ..database import get_db
 from ..models.models import Veiculo, StatusVeiculo
 from ..schemas.user import VeiculoCreate, VeiculoResponse
 

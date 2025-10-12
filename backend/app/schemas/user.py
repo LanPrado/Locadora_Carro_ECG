@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional, List
-from .models import CategoriaVeiculo, StatusVeiculo, StatusLocacao
+from ..models.models import CategoriaVeiculo, StatusVeiculo, StatusLocacao
 
 # Schemas de Autenticação
 class UsuarioCreate(BaseModel):
@@ -19,7 +19,7 @@ class UsuarioResponse(BaseModel):
         from_attributes = True
 
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr  # ← MUDE DE 'str' PARA 'EmailStr'
     senha: str
 
 class Token(BaseModel):
@@ -116,3 +116,17 @@ class DashboardStats(BaseModel):
     total_clientes: int
     locacoes_ativas: int
     faturamento_mensal: float
+
+class ReservaRequest(BaseModel):
+    veiculo_id: int
+    cpf: str
+    nome: str
+    email: EmailStr
+    telefone: str
+    cnh: str
+    endereco: str
+    data_inicio: datetime
+    data_fim: datetime
+
+class MudarStatusRequest(BaseModel):
+    status: StatusLocacao

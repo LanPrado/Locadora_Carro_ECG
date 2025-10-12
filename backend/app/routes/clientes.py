@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from database.database import get_db
+from ..database import get_db  # ← CORRIGIDO
 from ..models.models import Cliente
 from ..schemas.user import ClienteCreate, ClienteResponse
-from .auth import verificar_token
+from .auth import verificar_token  # ← CORRIGIDO
 
 router = APIRouter()
-
 @router.post("/", response_model=ClienteResponse)
 def criar_cliente(
     cliente: ClienteCreate,

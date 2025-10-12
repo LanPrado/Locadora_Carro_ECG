@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime, timedelta
-from database.database import get_db
-from backend.app.models.models import Locacao, Veiculo, Cliente, StatusLocacao, StatusVeiculo
-from backend.app.schemas.user import LocacaoResponse, ReservaRequest, MudarStatusRequest
-from auth import verificar_token
+from ..database import get_db  # ← CORRIGIDO
+from ..models.models import Locacao, Veiculo, Cliente, StatusLocacao, StatusVeiculo
+from ..schemas.user import LocacaoResponse, ReservaRequest, MudarStatusRequest
+from .auth import verificar_token  # ← CORRIGIDO
 
 router = APIRouter()
 

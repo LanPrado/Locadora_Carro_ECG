@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# Mantenha os imports relativos agora que teremos um pacote
-from backend.app.database import engine, Base, SessionLocal
-from .routes import auth, veiculos, clientes, locacoes, dashboard 
 
+# ✅ MUDE para imports RELATIVOS (com ponto)
+from .database import engine, Base, SessionLocal, get_db
+from .routes import auth, veiculos, clientes, locacoes, dashboard
 # Criar tabelas no banco
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Loadora Veículos API",
+    title="Locadora Veículos API",
     description="Sistema completo de locação de veículos",
     version="1.0.0",
     docs_url="/docs",
@@ -34,11 +34,15 @@ app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"]
 @app.get("/")
 def root():
     return {
-        "message": "Loadora Veículos API", 
+        "message": "Locadora Veículos API", 
         "version": "1.0.0",
         "docs": "/docs"
     }
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "service": "locadora-backend"}
+# Dependência para obter a sessão do banco de dados
+@app.middleware("http")
+async def db_session_middleware(request, call_next):
+    request.state.db = SessionLocal()
+    response = await call_next(request)
+    request.state.db.close()
+    return response     

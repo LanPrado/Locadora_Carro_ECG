@@ -1,22 +1,24 @@
 services:
   backend:
-  
     build: ./backend
     ports:
       - "8000:8000"  
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/locadora  # CORRIGIDO: = em vez de -
+      - DATABASE_URL=postgresql://locadora_user:password@postgres:5432/locadora_db
     depends_on:
       - postgres
-    command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_DB: locadora
-      POSTGRES_USER: user
+      POSTGRES_DB: locadora_db
+      POSTGRES_USER: locadora_user  
       POSTGRES_PASSWORD: password
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:  
+  postgres_data:

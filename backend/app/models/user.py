@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Enum
-from database.database import Base
+from ..database import Base  # ← CORRIGIDO
 from datetime import datetime
 import enum
 
