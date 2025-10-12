@@ -7,7 +7,10 @@ services:
       - DATABASE_URL=postgresql://locadora_user:password@postgres:5432/locadora_db
     depends_on:
       - postgres
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: >
+      sh -c "sleep 3 &&
+             python scripts/populate_vehicles.py &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - ./backend:/app
 

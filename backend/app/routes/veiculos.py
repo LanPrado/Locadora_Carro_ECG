@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.post("/", response_model=VeiculoResponse)
 def criar_veiculo(
-    veiculo: VeiculoCreate,
+    veiculo: VeiculoCreate, 
     db: Session = Depends(get_db),
     #usuario_email: str = Depends(verificar_token)
 ):
