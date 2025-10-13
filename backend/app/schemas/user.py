@@ -61,7 +61,6 @@ class ClienteCreate(BaseModel):
     email: EmailStr
     telefone: str
     cnh: str
-    data_validade_cnh: datetime
     endereco: str
 
 class ClienteResponse(BaseModel):
@@ -71,7 +70,6 @@ class ClienteResponse(BaseModel):
     email: str
     telefone: str
     cnh: str
-    data_validade_cnh: datetime
     endereco: str
     ativo: bool
     
