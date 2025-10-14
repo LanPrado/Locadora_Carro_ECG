@@ -234,7 +234,6 @@ def promover_para_admin(
     
     return {"message": f"Usuário {usuario.nome} promovido a administrador"}
 
-    user_id: str,
 #"@router.post("/rebaixar-admin/{user_id}")
 #def rebaixar_para_cliente(
     #user_id: str,
