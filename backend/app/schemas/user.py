@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional, List
 from ..models.models import CategoriaVeiculo, StatusVeiculo, StatusLocacao
@@ -10,7 +10,7 @@ class UsuarioCreate(BaseModel):
     senha: str
 
 class UsuarioResponse(BaseModel):
-    id: int
+    id: str
     email: str
     nome: str
     ativo: bool
@@ -19,13 +19,12 @@ class UsuarioResponse(BaseModel):
         from_attributes = True
 
 class LoginRequest(BaseModel):
-    email: EmailStr  # ← MUDE DE 'str' PARA 'EmailStr'
+    email: str = Field(..., description="Email ou ID do usuário")  # ← Adicione description
     senha: str
 
 class Token(BaseModel):
     access_token: str
     token_type: str
-
 # Schemas de Veículos
 class VeiculoCreate(BaseModel):
     placa: str
