@@ -234,12 +234,13 @@ def promover_para_admin(
     
     return {"message": f"Usuário {usuario.nome} promovido a administrador"}
 
-@router.post("/rebaixar-admin/{user_id}")
-def rebaixar_para_cliente(
     user_id: str,
-    db: Session = Depends(get_db),
-    admin_user: Usuario = Depends(get_current_admin_user)
-):
+#"@router.post("/rebaixar-admin/{user_id}")
+#def rebaixar_para_cliente(
+    #user_id: str,
+   # db: Session = Depends(get_db),
+   # admin_user: Usuario = Depends(get_current_admin_user)
+#):
     """
     Rebaixa um administrador para cliente
     Qualquer admin pode rebaixar, exceto a si mesmo
