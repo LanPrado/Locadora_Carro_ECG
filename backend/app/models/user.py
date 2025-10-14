@@ -12,3 +12,4 @@ class Usuario(Base):
     senha_hash = Column(String)
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, default=datetime.utcnow)
+    role = Column(String, default="cliente")
