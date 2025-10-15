@@ -4,13 +4,15 @@ sys.path.append('/app')
 
 from sqlalchemy import create_engine
 from backend.app.models.models import Base
-from database import get_db_url
 
+# Adicionar o caminho para encontrar o database.py
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+
+from database import SQLALCHEMY_DATABASE_URL
 
 def init_database():
     """Inicializa o banco de dados criando todas as tabelas"""
-    db_url = get_db_url()
+    db_url = SQLALCHEMY_DATABASE_URL
     print(f"🔧 Conectando ao banco de dados: {db_url.split('@')[1] if '@' in db_url else db_url}")
     
     try:
