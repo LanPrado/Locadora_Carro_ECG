@@ -3,6 +3,7 @@
 Este é o backend de uma aplicação de locadora de veículos construída com **FastAPI**, **SQLAlchemy (ORM)** e **PostgreSQL**.
 
 ## 🚀 Tecnologias
+## 📜 Descrição
 
 * **Framework:** FastAPI
 * **ORM:** SQLAlchemy 2.0
