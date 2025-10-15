@@ -6,6 +6,7 @@ from jose import JWTError
 from ..database import get_db
 from ..models.user import Usuario
 from .security import SECRET_KEY, ALGORITHM, verificar_token_jwt
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 # Dependência para obter usuário atual
