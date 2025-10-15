@@ -5,10 +5,14 @@ import os
 
 SQLALCHEMY_DATABASE_URL = os.environ["DATABASE_URL"]
 
-# ✅ CORRETO para PostgreSQL - sem connect_args
+# CORRETO para PostgreSQL - sem connect_args
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+#função para criar tabela
+def criar_tabelas():
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()

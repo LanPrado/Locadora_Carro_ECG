@@ -1,15 +1,20 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Enum
-from ..database import Base
+from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-import enum
+import uuid
+
+Base = declarative_base()
 
 class Usuario(Base):
     __tablename__ = "usuarios"
     
-    id = Column(String(20), primary_key=True, index=True)  # ← DEVE SER String(20)
-    email = Column(String, unique=True, index=True)
-    nome = Column(String)
-    senha_hash = Column(String)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String, unique=True, index=True, nullable=False)
+    nome = Column(String, nullable=False)
+    senha_hash = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="cliente")  # ← CORREÇÃO: Definir tipo explícito
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, default=datetime.utcnow)
-    role = Column(String, default="cliente")
+    
+    def __repr__(self):
+        return f"<Usuario(id={self.id}, email={self.email}, role={self.role})>"

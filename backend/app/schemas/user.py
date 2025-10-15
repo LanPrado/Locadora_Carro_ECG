@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional, List
 from ..models.models import CategoriaVeiculo, StatusVeiculo, StatusLocacao
 
-# Schemas de Autenticação
+# Esquemas de Autenticação
 class UsuarioCreate(BaseModel):
     email: EmailStr
     nome: str
@@ -26,7 +26,7 @@ class LoginRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-# Schemas de Veículos
+# Esquemas de Veículos
 class VeiculoCreate(BaseModel):
     placa: str
     modelo: str
@@ -54,7 +54,7 @@ class VeiculoResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Schemas de Clientes
+# Esquemas de Clientes
 class ClienteCreate(BaseModel):
     cpf: str
     nome: str
@@ -76,7 +76,7 @@ class ClienteResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Schemas de Locações
+# Esquemas de Locações
 class LocacaoCreate(BaseModel):
     cliente_id: int
     veiculo_id: int
@@ -107,14 +107,20 @@ class CheckinRequest(BaseModel):
 class CheckoutRequest(BaseModel):
     quilometragem_final: int
 
-# Schema do Dashboard
+# Esquema do Dashboard
 class DashboardStats(BaseModel):
     total_veiculos: int
     veiculos_disponiveis: int
+    veiculos_manutencao: int
+    veiculos_locados: int
     total_clientes: int
     locacoes_ativas: int
     faturamento_mensal: float
+    faturamento_total: float
+    #locacoes: List[LocacaoResponse]
 
+    class Config:
+        from_attributes = True
 class ReservaRequest(BaseModel):
     veiculo_id: int
     cpf: str

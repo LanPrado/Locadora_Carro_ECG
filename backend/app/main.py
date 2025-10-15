@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# ✅ MUDE para imports RELATIVOS (com ponto)
-from .database import engine, Base, SessionLocal, get_db
-from .routes import auth, veiculos, clientes, locacoes, dashboard
-# Criar tabelas no banco
+# Imports do database
+from .database import engine, Base, SessionLocal
+
+# Importar os MODELOS antes de criar as tabelas
+from .models.models import Veiculo, Cliente, Locacao
+from .models.user import Usuario
+
+# Criar as tabelas
 Base.metadata.create_all(bind=engine)
+
+print("🔧 Carregando rotas de autenticação...")
+from .routes import auth, veiculos, clientes, locacoes, dashboard
+print("✅ Rotas carregadas")
 
 app = FastAPI(
     title="Locadora Veículos API",
@@ -24,7 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registrar rotas
+# Rotas - CADA UM EM LINHA SEPARADA
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticação"])
 app.include_router(veiculos.router, prefix="/api/veiculos", tags=["Veículos"])
 app.include_router(clientes.router, prefix="/api/clientes", tags=["Clientes"])
@@ -45,4 +53,4 @@ async def db_session_middleware(request, call_next):
     request.state.db = SessionLocal()
     response = await call_next(request)
     request.state.db.close()
-    return response     
+    return response
