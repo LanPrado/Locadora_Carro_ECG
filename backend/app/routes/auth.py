@@ -22,10 +22,7 @@ from ..core.security import (
     extrair_sobrenome
 )
 
-# ============================================================================
 # ROUTERS PRINCIPAIS
-# ============================================================================
-
 router = APIRouter(tags=["Autenticação"])
 cliente_router = APIRouter(tags=["Cliente"])
 admin_router = APIRouter(tags=["Administração"])
@@ -124,7 +121,7 @@ class UsuarioService:
             )
         
         # Log da exclusão
-        print(f"🚨 ADMIN EXCLUÍDO: {usuario.nome} ({usuario.email}) por {admin_executor.nome} em {datetime.now(timezone.utc)}")
+        print(f"ADMIN EXCLUÍDO: {usuario.nome} ({usuario.email}) por {admin_executor.nome} em {datetime.now(timezone.utc)}")
         
         db.delete(usuario)
         db.commit()
@@ -155,11 +152,7 @@ class ValidacaoUsuario:
                 detail="Não é possível excluir a única conta administrativa do sistema"
             )
 
-
-# ============================================================================
 # ROTAS PÚBLICAS DE AUTENTICAÇÃO
-# ============================================================================
-
 @router.post("/registrar", 
     response_model=UsuarioResponse,
     summary="Registrar novo usuário",
@@ -174,7 +167,6 @@ def registrar_usuario(
     O primeiro usuário registrado automaticamente se torna administrador.
     """
     return UsuarioService.criar_novo_usuario(db, usuario)
-
 
 @router.post("/login", 
     response_model=Token,
@@ -208,10 +200,7 @@ def login_usuario(
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-
-# ============================================================================
 # ROTAS DE CLIENTE (ÁREA DO CLIENTE)
-# ============================================================================
 
 @cliente_router.get("/me", 
     response_model=UsuarioResponse,
@@ -254,10 +243,7 @@ def excluir_minha_conta_cliente(
     db.commit()
     return {"message": "Sua conta foi excluída com sucesso"}
 
-
-# ============================================================================
 # ROTAS DE ADMINISTRAÇÃO (ÁREA DO ADMIN)
-# ============================================================================
 
 @admin_router.get("/me",
     response_model=UsuarioResponse,
@@ -306,11 +292,9 @@ def rebaixar_para_cliente(
     admin_user: Usuario = Depends(get_current_admin_user)
 ):
     """Rebaixa um administrador para cliente"""
-    # CORREÇÃO: Passar o objeto usuário completo
     ValidacaoUsuario.validar_auto_rebaixamento(user_id, admin_user)
     usuario_atualizado = UsuarioService.alterar_role_usuario(db, user_id, "cliente")
     return {"message": f"Usuário {usuario_atualizado.nome} rebaixado para cliente"}
-
 
 @admin_router.delete("/conta/{user_id}",
     summary="Excluir conta administrativa",
@@ -338,11 +322,6 @@ def excluir_minha_conta_admin(
     db.delete(current_user)
     db.commit()
     return {"message": "Sua conta administrativa foi excluída com sucesso"}
-
-
-# ============================================================================
-# INCLUIR ROUTERS COM PREFIXOS CORRETOS
-# ============================================================================
 
 # Incluir rotas de cliente com prefixo /clientes
 router.include_router(cliente_router, prefix="/clientes")
