@@ -25,8 +25,14 @@ def reservar_veiculo(
     if veiculo is None:
         raise HTTPException(status_code=404, detail="Veículo não encontrado")
     
-    # CORREÇÃO: Converter para string antes da comparação
-    if str(veiculo.status) != StatusVeiculo.DISPONIVEL.value:
+    # CORREÇÃO: Acessar o valor do status corretamente
+    veiculo_status = veiculo.status
+    if veiculo_status is None:
+        veiculo_status_str = ""
+    else:
+        veiculo_status_str = str(veiculo_status.value)
+    
+    if veiculo_status_str != StatusVeiculo.DISPONIVEL.value:
         raise HTTPException(status_code=400, detail="Veículo não disponível para reserva")
     
     # Verifica se há conflito de datas
@@ -76,13 +82,11 @@ def reservar_veiculo(
         data_fim=reserva.data_fim,
         quilometragem_inicial=veiculo.quilometragem,
         valor_total=valor_total,
-        status=StatusLocacao.RESERVADA.value
+        status=StatusLocacao.RESERVADA
     )
     
-    # CORREÇÃO: Atualizar status do veículo usando update
-    db.query(Veiculo).filter(Veiculo.id == reserva.veiculo_id).update(
-        {"status": StatusVeiculo.LOCADO.value}
-    )
+    # CORREÇÃO: Atualizar status do veículo usando setattr
+    setattr(veiculo, 'status', StatusVeiculo.LOCADO)
     
     db.add(nova_locacao)
     db.commit()
@@ -103,7 +107,7 @@ def listar_locacoes(
     query = db.query(Locacao)
     
     if status:
-        query = query.filter(Locacao.status == status.value)
+        query = query.filter(Locacao.status == status)
     
     return query.order_by(Locacao.data_inicio.desc()).all()
 
@@ -145,27 +149,19 @@ def alterar_status_locacao(
     if veiculo is None:
         raise HTTPException(status_code=404, detail="Veículo associado não encontrado")
     
-    # CORREÇÃO: Atualizar usando update
-    db.query(Locacao).filter(Locacao.id == locacao_id).update(
-        {"status": status_request.status.value}
-    )
+    # CORREÇÃO: Atualizar usando setattr
+    setattr(locacao, 'status', status_request.status)
     
-    # CORREÇÃO: Atualizar status do veículo baseado no status da locação usando update
+    # CORREÇÃO: Atualizar status do veículo baseado no status da locação usando setattr
     if status_request.status == StatusLocacao.ATIVA:
-        db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).update(
-            {"status": StatusVeiculo.LOCADO.value}
-        )
+        setattr(veiculo, 'status', StatusVeiculo.LOCADO)
     elif status_request.status in [StatusLocacao.FINALIZADA, StatusLocacao.CANCELADA]:
-        db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).update(
-            {"status": StatusVeiculo.DISPONIVEL.value}
-        )
+        setattr(veiculo, 'status', StatusVeiculo.DISPONIVEL)
     
     db.commit()
+    db.refresh(locacao)
     
-    # Recarregar a locação atualizada
-    locacao_atualizada = db.query(Locacao).filter(Locacao.id == locacao_id).first()
-    
-    return locacao_atualizada
+    return locacao
 
 @router.post("/{locacao_id}/checkin",
     response_model=LocacaoResponse,
@@ -181,26 +177,28 @@ def realizar_checkin(
     if locacao is None:
         raise HTTPException(status_code=404, detail="Locação não encontrada")
     
-    # CORREÇÃO: Converter para string antes da comparação
-    if str(locacao.status) != StatusLocacao.RESERVADA.value:
+    # CORREÇÃO: Acessar o valor do status corretamente
+    locacao_status = locacao.status
+    if locacao_status is None:
+        locacao_status_str = ""
+    else:
+        locacao_status_str = str(locacao_status.value)
+    
+    if locacao_status_str != StatusLocacao.RESERVADA.value:
         raise HTTPException(status_code=400, detail="Check-in só pode ser realizado para locações reservadas")
     
-    # CORREÇÃO: Atualizar usando update
-    db.query(Locacao).filter(Locacao.id == locacao_id).update(
-        {"status": StatusLocacao.ATIVA.value}
-    )
+    # CORREÇÃO: Atualizar usando setattr
+    setattr(locacao, 'status', StatusLocacao.ATIVA)
     
-    # CORREÇÃO: Atualizar status do veículo usando update
-    db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).update(
-        {"status": StatusVeiculo.LOCADO.value}
-    )
+    # CORREÇÃO: Atualizar status do veículo usando setattr
+    veiculo = db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).first()
+    if veiculo:
+        setattr(veiculo, 'status', StatusVeiculo.LOCADO)
     
     db.commit()
+    db.refresh(locacao)
     
-    # Recarregar a locação atualizada
-    locacao_atualizada = db.query(Locacao).filter(Locacao.id == locacao_id).first()
-    
-    return locacao_atualizada
+    return locacao
 
 @router.post("/{locacao_id}/checkout",
     response_model=LocacaoResponse,
@@ -217,47 +215,62 @@ def realizar_checkout(
     if locacao is None:
         raise HTTPException(status_code=404, detail="Locação não encontrada")
     
-    if str(locacao.status) != StatusLocacao.ATIVA.value:
+    # CORREÇÃO: Acessar o valor do status corretamente
+    locacao_status = locacao.status
+    if locacao_status is None:
+        locacao_status_str = ""
+    else:
+        locacao_status_str = str(locacao_status.value)
+    
+    if locacao_status_str != StatusLocacao.ATIVA.value:
         raise HTTPException(status_code=400, detail="Check-out só pode ser realizado para locações ativas")
     
-    quilometragem_inicial_val = getattr(locacao, "quilometragem_inicial", None)
-    data_fim_val = getattr(locacao, "data_fim", None)
+    # CORREÇÃO DEFINITIVA: Usar uma função auxiliar para verificar
+    def _is_valid_quilometragem(loc: Locacao, km_final: int) -> bool:
+        km_inicial = getattr(loc, 'quilometragem_inicial', None)
+        if km_inicial is None:
+            return False
+        return km_final >= km_inicial
     
-    if quilometragem_inicial_val is not None and quilometragem_final < quilometragem_inicial_val:
+    def _has_atraso(loc: Locacao, data_devol: datetime) -> bool:
+        data_fim = getattr(loc, 'data_fim', None)
+        if isinstance(data_fim, datetime) and isinstance(data_devol, datetime):
+            return data_devol > data_fim
+        return False
+    
+    # Verificar quilometragem
+    if not _is_valid_quilometragem(locacao, quilometragem_final):
         raise HTTPException(status_code=400, detail="Quilometragem final não pode ser menor que a inicial")
     
     data_devolucao = datetime.utcnow()
     multa = 0.0
-    # Extrair valor para variável antes de comparar
-    if isinstance(data_fim_val, datetime) and data_devolucao > data_fim_val:
-        dias_atraso = (data_devolucao - data_fim_val).days
+
+    # Verificar atraso
+    if _has_atraso(locacao, data_devolucao):
+        dias_atraso = (data_devolucao - locacao.data_fim).days
         if dias_atraso > 0:
-            dias_locacao = (data_fim_val - locacao.data_inicio).days
+            dias_locacao = (locacao.data_fim - locacao.data_inicio).days
             if dias_locacao > 0:
                 multa = dias_atraso * (locacao.valor_total / dias_locacao) * 0.5
     
     valor_total_final = locacao.valor_total + multa
     
-    # CORREÇÃO: Atualizar usando update
-    db.query(Locacao).filter(Locacao.id == locacao_id).update({
-        "status": StatusLocacao.FINALIZADA.value,
-        "data_devolucao": data_devolucao,
-        "quilometragem_final": quilometragem_final,
-        "valor_total": valor_total_final
-    })
+    # CORREÇÃO: Atualizar usando setattr
+    setattr(locacao, 'status', StatusLocacao.FINALIZADA)
+    setattr(locacao, 'data_devolucao', data_devolucao)
+    setattr(locacao, 'quilometragem_final', quilometragem_final)
+    setattr(locacao, 'valor_total', valor_total_final)
     
-    # CORREÇÃO: Atualizar status e quilometragem do veículo usando update
-    db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).update({
-        "status": StatusVeiculo.DISPONIVEL.value,
-        "quilometragem": quilometragem_final
-    })
+    # CORREÇÃO: Atualizar status e quilometragem do veículo usando setattr
+    veiculo = db.query(Veiculo).filter(Veiculo.id == locacao.veiculo_id).first()
+    if veiculo:
+        setattr(veiculo, 'status', StatusVeiculo.DISPONIVEL)
+        setattr(veiculo, 'quilometragem', quilometragem_final)
     
     db.commit()
+    db.refresh(locacao)
     
-    # Recarregar a locação atualizada
-    locacao_atualizada = db.query(Locacao).filter(Locacao.id == locacao_id).first()
-    
-    return locacao_atualizada
+    return locacao
 
 def calcular_multa_atraso(data_fim_previsto: datetime, data_devolucao: datetime, diaria: float) -> float:
     """

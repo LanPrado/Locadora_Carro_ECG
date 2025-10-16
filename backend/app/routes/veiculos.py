@@ -12,17 +12,17 @@ from ..models.user import Usuario
 
 router = APIRouter()
 
-# Criar Enums para os parâmetros (usando os MESMOS valores do modelo)
+# ENUMs ATUALIZADOS para MAIÚSCULAS (igual aos do modelo)
 class CategoriaFilter(str, Enum):
-    ECONOMICO = "econômico"
-    INTERMEDIARIO = "intermediário"
-    LUXO = "luxo"
-    SUV = "suv"
+    ECONOMICO = "ECONOMICO"
+    INTERMEDIARIO = "INTERMEDIARIO"
+    LUXO = "LUXO"
+    SUV = "SUV"
 
 class StatusFilter(str, Enum):
-    DISPONIVEL = "disponível"
-    LOCADO = "locado"
-    MANUTENCAO = "manutenção"
+    DISPONIVEL = "DISPONIVEL"
+    LOCADO = "LOCADO"
+    MANUTENCAO = "MANUTENCAO"
 
 # ENDPOINT POST PARA CRIAR VEÍCULO (APENAS ADMIN)
 @router.post("/", response_model=VeiculoResponse)
@@ -55,15 +55,19 @@ def listar_veiculos(
         
         print(f"🔍 Filtros recebidos - categoria: {categoria}, status: {status}")
         
-        # Filtro por categoria
+        # Filtro por categoria - USANDO ENUM DO MODELO DIRETAMENTE
         if categoria is not None:
-            query = query.filter(Veiculo.categoria == categoria.value)  # type: ignore
-            print(f"✅ Aplicando filtro de categoria: {categoria.value}")
+            # Converter string para ENUM do modelo
+            categoria_enum = CategoriaVeiculo(categoria.value)
+            query = query.filter(Veiculo.categoria == categoria_enum)
+            print(f"✅ Aplicando filtro de categoria: {categoria_enum.value}")
         
-        # Filtro por status
+        # Filtro por status - USANDO ENUM DO MODELO DIRETAMENTE
         if status is not None:
-            query = query.filter(Veiculo.status == status.value)  # type: ignore
-            print(f"✅ Aplicando filtro de status: {status.value}")
+            # Converter string para ENUM do modelo
+            status_enum = StatusVeiculo(status.value)
+            query = query.filter(Veiculo.status == status_enum)
+            print(f"✅ Aplicando filtro de status: {status_enum.value}")
         
         veiculos = query.all()
         print(f"📊 Retornando {len(veiculos)} veículos")
@@ -72,6 +76,7 @@ def listar_veiculos(
     except Exception as e:
         print(f"Erro ao buscar veículos: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erro interno do servidor: {str(e)}")
+
 @router.get("/{veiculo_id}", response_model=VeiculoResponse)
 def obter_veiculo(veiculo_id: int, db: Session = Depends(get_db)):
     veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
@@ -117,15 +122,9 @@ def alterar_status_veiculo(
     if not db_veiculo:
         raise HTTPException(status_code=404, detail="Veículo não encontrado")
     
-    # Mapeamento direto para strings
-    status_map = {
-        StatusFilter.DISPONIVEL: "disponível",
-        StatusFilter.LOCADO: "locado",
-        StatusFilter.MANUTENCAO: "manutenção"
-    }
-    
-    # Ignorar warning do Pylance - isso funciona no SQLAlchemy
-    db_veiculo.status = status_map[status]  # type: ignore
+    # CORREÇÃO: Usar setattr para evitar problemas de tipo
+    status_enum = StatusVeiculo(status.value)
+    setattr(db_veiculo, 'status', status_enum)
     db.commit()
     db.refresh(db_veiculo)
     
@@ -138,13 +137,22 @@ def listar_todos_veiculos(db: Session = Depends(get_db)):
     veiculos = db.query(Veiculo).all()
     result = []
     for v in veiculos:
+        # CORREÇÃO: Acessar os valores dos ENUMs corretamente
+        categoria_valor = v.categoria
+        status_valor = v.status
+        
+        if categoria_valor is not None:
+            categoria_valor = categoria_valor.value
+        if status_valor is not None:
+            status_valor = status_valor.value
+            
         result.append({
             "id": v.id,
             "placa": v.placa,
             "modelo": v.modelo,
             "marca": v.marca,
-            "categoria": v.categoria.value if v.categoria else None, # type: ignore
-            "status": v.status.value if v.status else None, # type: ignore
+            "categoria": categoria_valor,
+            "status": status_valor,
             "ano": v.ano,
             "diaria": v.diaria
         })
@@ -158,19 +166,13 @@ def atualizar_status_em_massa(
     usuario_admin: Usuario = Depends(get_current_admin_user)
 ):
     """Atualiza o status de TODOS os veículos para o status especificado"""
-    # Mapeamento direto para strings
-    status_map = {
-        StatusFilter.DISPONIVEL: "disponível",
-        StatusFilter.LOCADO: "locado", 
-        StatusFilter.MANUTENCAO: "manutenção"
-    }
+    status_enum = StatusVeiculo(novo_status.value)
     
     veiculos = db.query(Veiculo).all()
-    status_value = status_map[novo_status]
     
     for veiculo in veiculos:
-        # Ignorar warning do Pylance - isso funciona no SQLAlchemy
-        veiculo.status = status_value  # type: ignore
+        # CORREÇÃO: Usar setattr para evitar problemas de tipo
+        setattr(veiculo, 'status', status_enum)
     
     db.commit()
     

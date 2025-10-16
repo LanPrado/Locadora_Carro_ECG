@@ -1,9 +1,8 @@
-# backend/app/core/dependencies.py
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-# Importações absolutas para a estrutura com scripts/__init__.py
+# Importações absolutas
 import sys
 from pathlib import Path
 
@@ -47,7 +46,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 # Dependência para validar administrador
 def get_current_admin_user(current_user: Usuario = Depends(get_current_user)) -> Usuario:
-    if str(current_user.role) != "admin":
+    # CORREÇÃO: Acessar o valor da role corretamente
+    role_atual = current_user.role
+    if role_atual is None:
+        role_str = ""
+    else:
+        role_str = str(role_atual)
+        
+    if role_str != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissão negada: acesso restrito a administradores"
@@ -56,7 +62,14 @@ def get_current_admin_user(current_user: Usuario = Depends(get_current_user)) ->
 
 # Dependência para validar cliente
 def get_current_cliente_user(current_user: Usuario = Depends(get_current_user)) -> Usuario:
-    if str(current_user.role) != "cliente":
+    # CORREÇÃO: Acessar o valor da role corretamente
+    role_atual = current_user.role
+    if role_atual is None:
+        role_str = ""
+    else:
+        role_str = str(role_atual)
+        
+    if role_str != "cliente":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissão negada: acesso restrito a clientes"
@@ -65,7 +78,14 @@ def get_current_cliente_user(current_user: Usuario = Depends(get_current_user)) 
 
 # Dependência para validar primeiro admin
 def get_primeiro_admin_user(current_user: Usuario = Depends(get_current_user), db: Session = Depends(get_db)) -> Usuario:
-    if str(current_user.role) != "admin":
+    # CORREÇÃO: Acessar o valor da role corretamente
+    role_atual = current_user.role
+    if role_atual is None:
+        role_str = ""
+    else:
+        role_str = str(role_atual)
+        
+    if role_str != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissão negada: acesso restrito a administradores"
@@ -75,7 +95,17 @@ def get_primeiro_admin_user(current_user: Usuario = Depends(get_current_user), d
     # Se não houver campo criado_em, usar id como fallback
     primeiro_admin = db.query(Usuario).filter(Usuario.role == "admin").order_by(Usuario.id).first()
     
-    if primeiro_admin is None or str(primeiro_admin.id) != str(current_user.id):
+    if primeiro_admin is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Nenhum administrador encontrado no sistema"
+        )
+    
+    # CORREÇÃO: Acessar o ID corretamente
+    primeiro_admin_id = primeiro_admin.id
+    current_user_id = current_user.id
+    
+    if str(primeiro_admin_id) != str(current_user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissão negada: apenas o administrador principal pode executar esta ação"

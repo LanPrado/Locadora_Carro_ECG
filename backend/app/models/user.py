@@ -1,18 +1,19 @@
 from sqlalchemy import Column, String, Boolean, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import uuid
 
-Base = declarative_base()
+# USE import absoluto em vez de relativo
+from app.database import Base  # ← Mude para import absoluto
 
 class Usuario(Base):
     __tablename__ = "usuarios"
+    __table_args__ = {'extend_existing': True}
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String, unique=True, index=True, nullable=False)
     nome = Column(String, nullable=False)
     senha_hash = Column(String, nullable=False)
-    role = Column(String, nullable=False, default="cliente")  # ← CORREÇÃO: Definir tipo explícito
+    role = Column(String, nullable=False, default="cliente")
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, default=datetime.utcnow)
     

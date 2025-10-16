@@ -5,21 +5,21 @@ from datetime import datetime
 import enum
 
 class CategoriaVeiculo(enum.Enum):
-    ECONOMICO = "econômico"
-    INTERMEDIARIO = "intermediário"
-    LUXO = "luxo"
-    SUV = "suv"
+    ECONOMICO = "ECONOMICO"
+    INTERMEDIARIO = "INTERMEDIARIO"
+    LUXO = "LUXO"
+    SUV = "SUV"
 
 class StatusVeiculo(enum.Enum):
-    DISPONIVEL = "disponível"
-    LOCADO = "locado"
-    MANUTENCAO = "manutenção"
+    DISPONIVEL = "DISPONIVEL"
+    LOCADO = "LOCADO"
+    MANUTENCAO = "MANUTENCAO"
 
 class StatusLocacao(enum.Enum):
-    RESERVADA = "reservada"
-    ATIVA = "ativa"
-    FINALIZADA = "finalizada"
-    CANCELADA = "cancelada"
+    RESERVADA = "RESERVADA"
+    ATIVA = "ATIVA"
+    FINALIZADA = "FINALIZADA"
+    CANCELADA = "CANCELADA"
 
 class Veiculo(Base):
     __tablename__ = "veiculos"
@@ -35,7 +35,6 @@ class Veiculo(Base):
     status = Column(Enum(StatusVeiculo), default=StatusVeiculo.DISPONIVEL)
     imagem_url = Column(String, nullable=True)
     descricao = Column(String, nullable=True)
-    
     locacoes = relationship("Locacao", back_populates="veiculo")
 
 class Cliente(Base):

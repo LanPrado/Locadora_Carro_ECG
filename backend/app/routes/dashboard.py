@@ -34,6 +34,7 @@ def obter_estatisticas(
         # Estatísticas de Veículos
         total_veiculos = db.query(Veiculo).count()
         
+        # CORREÇÃO: Usar os ENUMs corretamente
         veiculos_disponiveis = db.query(Veiculo).filter(
             Veiculo.status == StatusVeiculo.DISPONIVEL
         ).count()
@@ -61,7 +62,7 @@ def obter_estatisticas(
             Locacao.data_devolucao >= inicio_mes
         ).scalar() or 0.0
         
-        # Faturamento Total (CORREÇÃO: adicionar este campo)
+        # Faturamento Total
         faturamento_total = db.query(func.sum(Locacao.valor_total)).filter(
             Locacao.status == StatusLocacao.FINALIZADA
         ).scalar() or 0.0
@@ -74,7 +75,7 @@ def obter_estatisticas(
             total_clientes=total_clientes,
             locacoes_ativas=locacoes_ativas,
             faturamento_mensal=float(faturamento_mensal),
-            faturamento_total=float(faturamento_total)  # ← CORREÇÃO: Adicionar este campo
+            faturamento_total=float(faturamento_total)
         )
         
     except Exception as e:

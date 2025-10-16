@@ -4,12 +4,18 @@ from fastapi.middleware.cors import CORSMiddleware
 # Imports do database
 from .database import engine, Base, SessionLocal
 
-# Importar os MODELOS antes de criar as tabelas
+# Importar TODOS os modelos ANTES de criar as tabelas
 from .models.models import Veiculo, Cliente, Locacao
-from .models.user import Usuario
+from .models.user import Usuario  # ← Garantir que está importado
 
-# Criar as tabelas
-Base.metadata.create_all(bind=engine)
+print("🗄️ Criando tabelas do banco de dados...")
+
+# Criar as tabelas - DEVE vir depois de importar todos os modelos
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✅ Tabelas criadas com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao criar tabelas: {e}")
 
 print("🔧 Carregando rotas de autenticação...")
 from .routes import auth, veiculos, clientes, locacoes, dashboard
@@ -32,7 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Rotas - CADA UM EM LINHA SEPARADA
+# Rotas
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticação"])
 app.include_router(veiculos.router, prefix="/api/veiculos", tags=["Veículos"])
 app.include_router(clientes.router, prefix="/api/clientes", tags=["Clientes"])
