@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação do Projeto: Locadora Veículos API</title>
+    <!-- Inclui Tailwind CSS via CDN para estilo moderno e responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte padrão como Inter, moderna e limpa */
+        body { font-family: 'Inter', sans-serif; }
+        /* Garante que o container se adapta ao conteúdo */
+        .file-highlight { user-select: text; } 
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased p-4">
+
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-8 md:p-10 lg:p-12 mt-6">
+    <header class="text-center pb-6 border-b-4 border-blue-600 mb-8">
+        <h1 class="text-4xl font-extrabold text-blue-700 mb-1">Locadora Veículos API</h1>
+        <p class="text-lg text-gray-500">Desenvolvimento de Sistema de Gestão e Locação</p>
+    </header>
+
+    <section class="mb-10">
+        <h2 class="text-2xl font-semibold text-blue-600 mb-4 border-b pb-2">Visão Geral do Projeto</h2>
+        
+        <p class="text-gray-700 mb-6">
+            O sistema Locadora Veículos API foi construído sobre uma arquitetura *FastAPI* em Python, focado em alta performance e clareza de código. Desde o início, a prioridade foi garantir um ambiente de desenvolvimento consistente (com o uso de *Docker* e *PostgreSQL*) e uma separação clara de responsabilidades entre as diferentes partes da aplicação.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div class="p-4 bg-gray-100 rounded-lg shadow-inner">
+                <p class="text-3xl font-bold text-gray-900">Python/FastAPI</p>
+                <p class="text-sm text-gray-500">Backend Principal</p>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg shadow-inner">
+                <p class="text-3xl font-bold text-gray-900">PostgreSQL/SQLAlchemy</p>
+                <p class="text-sm text-gray-500">Persistência de Dados</p>
+            </div>
+            <div class="p-4 bg-gray-100 rounded-lg shadow-inner">
+                <p class="text-3xl font-bold text-gray-900">Docker Compose</p>
+                <p class="text-sm text-gray-500">Ambiente Containerizado</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fluxo de Trabalho (Natural) -->
+    <section class="space-y-8">
+        <h2 class="text-2xl font-semibold text-blue-600 mb-4 border-b pb-2">Como o Trabalho Foi Estruturado</h2>
+        
+        <!-- Bloco 1: O Coração do Negócio (Locações) -->
+        <div class="p-6 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-yellow-700 mb-2 flex items-center">
+                <span class="mr-2 text-2xl">⚙️</span> Gerenciamento de Locações e Regras
+            </h3>
+            <p class="text-gray-600 mb-3">
+                A principal funcionalidade, a locação de veículos, foi construída com foco na precisão. O sistema lida com o fluxo completo: reservas, `check-in` e `check-out`. A lógica de negócio está concentrada em garantir que não haja conflito de datas e que os cálculos de multas por atraso e descontos por tempo de locação sejam aplicados corretamente. O status do veículo (Disponível, Locado, Manutenção) é atualizado automaticamente ao longo do processo.
+            </p>
+            <strong class="block text-sm text-gray-700 mb-1">Coração da Lógica:</strong>
+            <code class="file-highlight bg-yellow-100 text-yellow-800 p-2 rounded-md block">backend/app/routes/locacoes.py</code>
+        </div>
+        
+        <!-- Bloco 2: O Pilar da Segurança (Auth/RBAC) -->
+        <div class="p-6 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-red-700 mb-2 flex items-center">
+                <span class="mr-2 text-2xl">🛡️</span> Segurança e Controle de Acesso (Admin vs. Cliente)
+            </h3>
+            <p class="text-gray-600 mb-3">
+                A segurança foi uma etapa fundamental. Implementamos um sistema de Autenticação JWT com controle de acesso baseado em função (RBAC). Isso garante que apenas administradores possam gerenciar veículos e clientes (CRUD), enquanto clientes podem apenas visualizar suas próprias locações. As senhas são armazenadas usando o algoritmo bcrypt para máxima segurança.
+            </p>
+            <strong class="block text-sm text-gray-700 mb-1">Arquivos-Chave de Segurança:</strong>
+            <code class="file-highlight bg-red-100 text-red-800 p-2 rounded-md block">backend/app/core/security.py</code> (Geração de JWT e Hash de Senha)
+            <code class="file-highlight bg-red-100 text-red-800 p-2 rounded-md block">backend/app/core/dependencies.py</code> (Regras de Autorização)
+        </div>
+        
+        <!-- Bloco 3: Base de Dados e Estrutura -->
+        <div class="p-6 bg-green-50 border-l-4 border-green-500 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-green-700 mb-2 flex items-center">
+                <span class="mr-2 text-2xl">💾</span> Modelagem de Dados e Persistência
+            </h3>
+            <p class="text-gray-600 mb-3">
+                Utilizamos o PostgreSQL como banco de dados, integrado via SQLAlchemy. Essa escolha permite uma modelagem orientada a objetos clara, visível nos arquivos de modelo. Toda a troca de dados entre a API e o cliente é validada rigorosamente pelo *Pydantic* (DTOs), garantindo que apenas dados limpos e tipados cheguem ao banco.
+            </p>
+            <strong class="block text-sm text-gray-700 mb-1">Arquivos de Estrutura:</strong>
+            <code class="file-highlight bg-green-100 text-green-800 p-2 rounded-md block">backend/app/models/models.py</code> (Definição de Entidades)
+            <code class="file-highlight bg-green-100 text-green-800 p-2 rounded-md block">backend/app/schemas/user.py</code> (Validação de Dados DTO)
+        </div>
+
+        <!-- Bloco 4: Estabilidade e Execução -->
+        <div class="p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-blue-700 mb-2 flex items-center">
+                <span class="mr-2 text-2xl">🚀</span> Robustez 
+            </h3>
+            <p class="text-gray-600 mb-3">
+                A API foi desenvolvida para ser robusta: o tratamento de erros utiliza `HTTPException` para retornar status codes claros (400, 401, 403, 404). Além disso, a execução é 100% containerizada com *Docker Compose*, simplificando o setup do ambiente (PostgreSQL + FastAPI) para qualquer desenvolvedor. A documentação interativa (Swagger UI) é gerada automaticamente.
+            </p>
+            <strong class="block text-sm text-gray-700 mb-1">Arquivos de Setup:</strong>
+            <code class="file-highlight bg-blue-100 text-blue-800 p-2 rounded-md block">docker-compose.yml</code> (Configuração do Ambiente)
+            <code class="file-highlight bg-blue-100 text-blue-800 p-2 rounded-md block">backend/tests/test_auth_e_veiculos.py</code> (Testes de Validação)
+        </div>
+
+    </section>
+
+    <footer class="mt-10 pt-6 border-t text-center text-sm text-gray-400">
+        Próximo passo: Teste as rotas diretamente na documentação da API em <span class="font-mono text-blue-600 font-medium">http://localhost:8000/docs</span>
+    </footer>
+</div>
+
+</body>
+</html>
