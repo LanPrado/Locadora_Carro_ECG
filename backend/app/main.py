@@ -10,21 +10,11 @@ from .database import engine, Base, SessionLocal
 
 # Importar TODOS os modelos ANTES de criar as tabelas
 from .models.models import Veiculo, Cliente, Locacao
-from .models.user import Usuario 
+from .models.Cliente import Usuario 
 
-print("🗄️ Criando tabelas do banco de dados...")
 
-# Criar as tabelas - DEVE vir depois de importar todos os modelos
-try:
-    Base.metadata.create_all(bind=engine)
-    print("✅ Tabelas criadas com sucesso!")
-except Exception as e:
-    print(f"❌ Erro ao criar tabelas: {e}")
-
-print("🔧 Carregando rotas de autenticação...")
-from .routes import auth, veiculos, clientes, locacoes, dashboard
-print("✅ Rotas carregadas")
-
+Base.metadata.create_all(bind=engine)
+   
 app = FastAPI(
     title="Locadora Veículos API",
     description="Sistema completo de locação de veículos",
@@ -41,10 +31,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 1. MONTAR O DIRETÓRIO ESTÁTICO (USANDO PATH)
-# Isso permite que a aplicação sirva arquivos da pasta 'static'
-# O Path(__file__).parent garante o caminho absoluto da pasta 'app'
+# Montar diretório estático
 static_dir = Path(__file__).parent / "static" 
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
@@ -57,15 +44,12 @@ app.include_router(clientes.router, prefix="/api/clientes", tags=["Clientes"])
 app.include_router(locacoes.router, prefix="/api/locacoes", tags=["Locações"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
 
-# 2. NOVA ROTA PARA SERVIR O ARQUIVO HTML NA RAIZ
+# 2 ROTA PARA SERVIR O ARQUIVO HTML NA RAIZ
 @app.get("/", include_in_schema=False) # include_in_schema=False oculta no /docs
 async def root():
     # Caminho completo para o arquivo HTML da apresentação (USANDO PATH)
     html_file_path = Path(__file__).parent / "static" / "apresentacao.html"
     
-    # Verifica se o arquivo HTML existe e o retorna.
-    if html_file_path.exists():
-        return FileResponse(html_file_path)
     
     # Fallback: se o arquivo não for encontrado, retorna a mensagem original.
     return {

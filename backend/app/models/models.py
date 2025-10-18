@@ -31,9 +31,7 @@ class Veiculo(Base):
     ano = Column(Integer)
     categoria = Column(Enum(CategoriaVeiculo))
     diaria = Column(Float)
-    quilometragem = Column(Integer, default=0)
     status = Column(Enum(StatusVeiculo), default=StatusVeiculo.DISPONIVEL)
-    imagem_url = Column(String, nullable=True)
     descricao = Column(String, nullable=True)
     locacoes = relationship("Locacao", back_populates="veiculo")
 

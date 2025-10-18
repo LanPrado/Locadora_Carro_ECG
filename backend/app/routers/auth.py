@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from fastapi.security import OAuth2PasswordRequestForm 
 
 from ..database import get_db
-from ..models.user import Usuario
+from ..models.Cliente import Usuario
 from ..models.models import Locacao, Cliente
 from ..schemas.user import UsuarioCreate, UsuarioResponse, Token, LocacaoResponse
 from ..core.dependencies import (

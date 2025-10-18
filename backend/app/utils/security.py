@@ -16,7 +16,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # Configuração para hash de senhas
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
 # Funções para senhas
 def criar_hash_senha(senha: str) -> str:
     """Cria hash bcrypt da senha"""
@@ -77,7 +76,7 @@ def gerar_id_unico(sobrenome: str, db: Session, tentativa: int = 0) -> str:
         id_candidato = f"{sobrenome}{random_suffix}"
     
     # Verifica se o ID já existe
-    from ..models.user import Usuario  # Importação local para evitar circular
+    from ..models.Cliente import Usuario  # Importação local para evitar circular
     usuario_existente = db.query(Usuario).filter(
         or_(Usuario.id == id_candidato, Usuario.email == id_candidato)
     ).first()

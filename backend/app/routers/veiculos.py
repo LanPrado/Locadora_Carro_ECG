@@ -8,7 +8,7 @@ from enum import Enum
 
 # IMPORTE as funções de autenticação
 from ..routes.auth import get_current_admin_user
-from ..models.user import Usuario
+from ..models.Cliente import Usuario
 
 router = APIRouter()
 

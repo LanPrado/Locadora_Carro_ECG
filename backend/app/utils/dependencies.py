@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from database import get_db
-from models.user import Usuario
+from backend.app.models.Cliente import Usuario
 
 # Importação do security
 try:
