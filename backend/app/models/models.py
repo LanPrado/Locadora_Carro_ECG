@@ -1,69 +1,35 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Enum
+# app/models.py
+from sqlalchemy import Column, Integer, String, Float, DateTime, Enum as SQLEnum
 from sqlalchemy.orm import relationship
-from ..database import Base
+from app.database import Base
 from datetime import datetime
-import enum
+import uuid
 
-class CategoriaVeiculo(enum.Enum):
-    ECONOMICO = "ECONOMICO"
-    INTERMEDIARIO = "INTERMEDIARIO"
-    LUXO = "LUXO"
-    SUV = "SUV"
+from .Veiculos import CategoriaVeiculo, StatusVeiculo
 
-class StatusVeiculo(enum.Enum):
-    DISPONIVEL = "DISPONIVEL"
-    LOCADO = "LOCADO"
-    MANUTENCAO = "MANUTENCAO"
-
-class StatusLocacao(enum.Enum):
-    RESERVADA = "RESERVADA"
-    ATIVA = "ATIVA"
-    FINALIZADA = "FINALIZADA"
-    CANCELADA = "CANCELADA"
 
 class Veiculo(Base):
     __tablename__ = "veiculos"
     
-    id = Column(Integer, primary_key=True, index=True)
-    placa = Column(String, unique=True, index=True)
-    modelo = Column(String)
-    marca = Column(String)
-    ano = Column(Integer)
-    categoria = Column(Enum(CategoriaVeiculo))
-    diaria = Column(Float)
-    status = Column(Enum(StatusVeiculo), default=StatusVeiculo.DISPONIVEL)
-    descricao = Column(String, nullable=True)
-    locacoes = relationship("Locacao", back_populates="veiculo")
-
-class Cliente(Base):
-    __tablename__ = "clientes"
+    # Chave corrigida para String (UUID)
+    Vei_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     
-    id = Column(Integer, primary_key=True, index=True)
-    cpf = Column(String, unique=True, index=True)
-    nome = Column(String)
-    email = Column(String)
-    telefone = Column(String)
-    cnh = Column(String)
-    data_validade_cnh = Column(DateTime)
-    endereco = Column(String)
-    ativo = Column(Boolean, default=True)
+    Vei_placa = Column(String(10), unique=True, index=True, nullable=False)
+    Vei_modelo = Column(String(50), nullable=False)
+    Vei_marca = Column(String(50), nullable=False)
+    Vei_ano = Column(Integer)
     
-    locacoes = relationship("Locacao", back_populates="cliente")
-
-class Locacao(Base):
-    __tablename__ = "locacoes"
+    # Enums corrigidos
+    Vei_categoria = Column(SQLEnum(CategoriaVeiculo), nullable=False)
+    Vei_diaria = Column(Float, nullable=False)
+    Vei_status = Column(SQLEnum(StatusVeiculo), default=StatusVeiculo.DISPONIVEL)
     
-    id = Column(Integer, primary_key=True, index=True)
-    cliente_id = Column(Integer, ForeignKey("clientes.id"))
-    veiculo_id = Column(Integer, ForeignKey("veiculos.id"))
-    data_inicio = Column(DateTime)
-    data_fim = Column(DateTime)
-    data_devolucao = Column(DateTime, nullable=True)
-    quilometragem_inicial = Column(Integer)
-    quilometragem_final = Column(Integer, nullable=True)
-    valor_total = Column(Float)
-    status = Column(Enum(StatusLocacao), default=StatusLocacao.RESERVADA)
-    criado_em = Column(DateTime, default=datetime.utcnow)
+    descricao = Column(String(255), nullable=True)
+    atualizado_em = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    cliente = relationship("Cliente", back_populates="locacoes")
-    veiculo = relationship("Veiculo", back_populates="locacoes")
+    # --- RELACIONAMENTO ATUALIZADO ---
+    # Agora aponta para a classe 'Reserva' (em Reservar.py)
+    reservas = relationship("Reserva", back_populates="veiculo")
+    
+    def __repr__(self):
+        return f"<Veiculo(Vei_id={self.Vei_id}, Vei_placa={self.Vei_placa})>"

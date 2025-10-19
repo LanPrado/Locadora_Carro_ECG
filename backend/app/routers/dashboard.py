@@ -2,10 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
+
 from ..database import get_db
-from ..models.models import Veiculo, Cliente, Locacao, StatusVeiculo, StatusLocacao
-from ..schemas.user import DashboardStats
-from .auth import get_current_admin_user
+
+from ..models.models import Veiculo                
+from ..models.Cliente import Cliente               
+from ..models.Reservar import Reserva               
+from ..models.Veiculos import StatusVeiculo, StatusLocacao 
+
+from .Cliente import DashboardStats
+from .autenticacao import get_current_admin_user
 
 router = APIRouter()
 
@@ -34,38 +40,23 @@ def obter_estatisticas(
         # Estatísticas de Veículos
         total_veiculos = db.query(Veiculo).count()
         
-        # CORREÇÃO: Usar os ENUMs corretamente
         veiculos_disponiveis = db.query(Veiculo).filter(
-            Veiculo.status == StatusVeiculo.DISPONIVEL
+            Veiculo.Vei_status == StatusVeiculo.DISPONIVEL # CORREÇÃO: Vei_status (como em models.py)
         ).count()
         
         veiculos_manutencao = db.query(Veiculo).filter(
-            Veiculo.status == StatusVeiculo.MANUTENCAO
+            Veiculo.Vei_status == StatusVeiculo.MANUTENCAO # CORREÇÃO: Vei_status
         ).count()
         
         veiculos_locados = db.query(Veiculo).filter(
-            Veiculo.status == StatusVeiculo.LOCADO
+            Veiculo.Vei_status == StatusVeiculo.LOCADO # CORREÇÃO: Vei_status
         ).count()
         
-        # Estatísticas de Clientes
-        total_clientes = db.query(Cliente).filter(Cliente.ativo == True).count()
+        total_clientes = db.query(Cliente).filter(Cliente.cli_ativo == True).count() # CORREÇÃO: cli_ativo
         
-        # Estatísticas de Locações
-        locacoes_ativas = db.query(Locacao).filter(
-            Locacao.status == StatusLocacao.ATIVA
+        locacoes_ativas = db.query(Reserva).filter(
+            Reserva.res_status == StatusLocacao.ATIVA # Usando os campos de Reservar.py
         ).count()
-        
-        # Faturamento Mensal
-        inicio_mes = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        faturamento_mensal = db.query(func.sum(Locacao.valor_total)).filter(
-            Locacao.status == StatusLocacao.FINALIZADA,
-            Locacao.data_devolucao >= inicio_mes
-        ).scalar() or 0.0
-        
-        # Faturamento Total
-        faturamento_total = db.query(func.sum(Locacao.valor_total)).filter(
-            Locacao.status == StatusLocacao.FINALIZADA
-        ).scalar() or 0.0
         
         return DashboardStats(
             total_veiculos=total_veiculos,
@@ -74,8 +65,6 @@ def obter_estatisticas(
             veiculos_locados=veiculos_locados,
             total_clientes=total_clientes,
             locacoes_ativas=locacoes_ativas,
-            faturamento_mensal=float(faturamento_mensal),
-            faturamento_total=float(faturamento_total)
         )
         
     except Exception as e:
@@ -83,3 +72,4 @@ def obter_estatisticas(
             status_code=500, 
             detail=f"Erro ao obter estatísticas do dashboard: {str(e)}"
         )
+}

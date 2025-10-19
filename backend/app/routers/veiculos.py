@@ -3,16 +3,15 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
 from ..models.models import Veiculo, StatusVeiculo, CategoriaVeiculo
-from ..schemas.user import VeiculoCreate, VeiculoResponse
+from .Cliente import VeiculoCreate, VeiculoResponse
 from enum import Enum
 
 # IMPORTE as funções de autenticação
-from ..routes.auth import get_current_admin_user
-from ..models.Cliente import Usuario
+from .autenticacao import get_current_admin_user
+from ..models.Cliente import Cliente as Usuario
 
 router = APIRouter()
 
-# ENUMs ATUALIZADOS para MAIÚSCULAS (igual aos do modelo)
 class CategoriaFilter(str, Enum):
     ECONOMICO = "ECONOMICO"
     INTERMEDIARIO = "INTERMEDIARIO"
@@ -24,7 +23,6 @@ class StatusFilter(str, Enum):
     LOCADO = "LOCADO"
     MANUTENCAO = "MANUTENCAO"
 
-# ENDPOINT POST PARA CRIAR VEÍCULO (APENAS ADMIN)
 @router.post("/", response_model=VeiculoResponse)
 def criar_veiculo(
     veiculo: VeiculoCreate, 

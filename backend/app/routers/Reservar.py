@@ -4,9 +4,9 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 
 from ..database import get_db
-from ..models.models import Locacao, Veiculo, Cliente, StatusLocacao, StatusVeiculo
-from ..schemas.user import LocacaoResponse, ReservaRequest, MudarStatusRequest
-from .auth import get_current_user, get_current_admin_user
+from ..models.models import Veiculo, Cliente, StatusLocacao, StatusVeiculo
+from .Cliente import LocacaoResponse, ReservaRequest, MudarStatusRequest
+from .autenticacao import get_current_user, get_current_admin_user
 
 router = APIRouter()
 
