@@ -2,18 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
-# --- CORREÇÃO: Nomes de modelo corretos ---
 from ..models.models import Veiculo
 from ..models.Veiculos import StatusVeiculo, CategoriaVeiculo
 from ..models.Adm import Admin # Para type hint da dependência
-# --- CORREÇÃO DE IMPORTS ---
-from ..Schemas.Veiculo import VeiculoCreate, VeiculoResponse # CORRETO
-from ..utils.dependencies import get_current_admin_user # CORRETO
+
+from Schemas.Veiculos import VeiculoCreate, VeiculoResponse 
+from ..utils.dependencies import get_current_admin_user 
 from enum import Enum
 
 router = APIRouter()
 
-# Classes de Filtro (Estavam boas)
 class CategoriaFilter(str, Enum):
     ECONOMICO = "ECONOMICO"
     INTERMEDIARIO = "INTERMEDIARIO"

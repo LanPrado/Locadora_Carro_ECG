@@ -11,8 +11,8 @@ from ..models.Reservar import Reserva # O Modelo Correto
 from ..models.Veiculos import StatusVeiculo, StatusLocacao 
 from ..models.Adm import Admin # Para type hint
 from ..Schemas.Dashboard import DashboardStats # O Schema Correto
-from ..utils.dependencies import get_current_admin_user # A dependência Correta
-# ---------------------------
+from ..utils.dependencies import get_current_admin_user
+from backend.app.models import Cliente # A dependência Correta
 
 router = APIRouter(
     prefix="/dashboard",
@@ -43,7 +43,7 @@ def obter_estatisticas(
         
         # Clientes
         total_clientes = db.query(Cliente).filter(Cliente.cli_ativo == True).count()
-        
+
         # "Usuários ativos" (Locações ativas)
         locacoes_ativas = db.query(Reserva).filter(
             Reserva.res_status == StatusLocacao.ATIVA

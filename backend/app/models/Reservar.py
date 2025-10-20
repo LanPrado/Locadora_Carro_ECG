@@ -6,7 +6,6 @@ import uuid
 
 from app.database import Base 
 from .Veiculos import StatusLocacao
-# --- CORREÇÃO AQUI ---
 from .Cliente import Cliente
 from .models import Veiculo
 
@@ -37,10 +36,7 @@ class Reserva(Base):
     )
     res_total: Mapped[float | None] = mapped_column(Float, nullable=True)
 
-    # --- ADIÇÃO: Campos que faltavam mas eram usados no router ---
     data_devolucao: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    quilometragem_inicial: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    quilometragem_final: Mapped[int | None] = mapped_column(Integer, nullable=True)
     
     # Relacionamentos
     veiculo: Mapped["Veiculo"] = relationship(back_populates="reservas")

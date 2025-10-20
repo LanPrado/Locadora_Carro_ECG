@@ -12,7 +12,7 @@ class ReservaRequest(BaseModel):
     class Config:
         from_attributes = True
 
-
+# Schema de resposta para uma locação/reserva
 class LocacaoResponse(BaseModel):
     res_id: str
     res_vei_id: str
@@ -26,7 +26,7 @@ class LocacaoResponse(BaseModel):
         from_attributes = True
         use_enum_values = True
 
-# Schema para mudar o status de uma locação
+# Schema para mudar o status de uma locação (suficiente para devolução)
 class MudarStatusRequest(BaseModel):
     status: StatusLocacao
     class Config:

@@ -20,10 +20,7 @@ class Veiculo(Base):
     categoria = Column(SQLEnum(CategoriaVeiculo), nullable=False)
     diaria = Column(Float, nullable=False)
     status = Column(SQLEnum(StatusVeiculo), default=StatusVeiculo.DISPONIVEL)
-    
-    quilometragem = Column(Integer, default=0)
-    imagem_url = Column(String(255), nullable=True)
-    
+        
     descricao = Column(String(255), nullable=True)
     atualizado_em = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

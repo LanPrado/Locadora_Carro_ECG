@@ -10,13 +10,13 @@ class VeiculoCreate(BaseModel):
     ano: int
     categoria: CategoriaVeiculo
     diaria: float
-    quilometragem: Optional[int] = 0
     descricao: Optional[str] = None
     imagem_url: Optional[str] = None
     status: Optional[StatusVeiculo] = StatusVeiculo.DISPONIVEL
 
     class Config:
         from_attributes = True
+        use_enum_values = True
 
 # Schema de resposta para um veículo
 class VeiculoResponse(BaseModel):
@@ -29,6 +29,8 @@ class VeiculoResponse(BaseModel):
     diaria: float
     status: StatusVeiculo
     descricao: Optional[str] = None
-    
+    #imagem_url: Optional[str] = None
+
     class Config:
         from_attributes = True
+        use_enum_values = True

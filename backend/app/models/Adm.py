@@ -30,4 +30,3 @@ class Admin(Base):
     def __repr__(self):
         return f"<Admin(id={self.id}, codigo={self.codigo_admin}, nome={self.nome})>"
     
-A

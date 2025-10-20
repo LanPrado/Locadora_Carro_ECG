@@ -5,7 +5,7 @@ from datetime import datetime
 
 from ..database import get_db
 from ..models.models import Veiculo
-from ..models.Cliente import Cliente
+from ..models.Cliente import Cliente, ClienteResponse, ClienteCreate
 from ..models.Veiculos import StatusLocacao, StatusVeiculo
 from ..models.Reservar import Reserva
 from ..models.Adm import Admin
