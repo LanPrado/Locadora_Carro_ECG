@@ -3,11 +3,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 import uuid
-
+from models import Veiculo, Cliente
 from app.database import Base 
 from .Veiculos import StatusLocacao
-from .Cliente import Cliente
-from .models import Veiculo
 
 class Reserva(Base):
     __tablename__ = "reservas"
@@ -18,7 +16,7 @@ class Reserva(Base):
     
     # Chaves estrangeiras
     res_vei_id: Mapped[str] = mapped_column(
-        ForeignKey("veiculos.Vei_id"), nullable=False, index=True
+        ForeignKey("veiculos.id"), nullable=False, index=True # CORREÇÃO: Aponta para veiculos.id
     )
     res_cli_id: Mapped[str] = mapped_column(
         ForeignKey("clientes.cli_id"), nullable=False, index=True
@@ -36,6 +34,11 @@ class Reserva(Base):
         Enum(StatusLocacao), default=StatusLocacao.RESERVADA
     )
     res_total: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    # --- ADIÇÃO: Campos que faltavam mas eram usados no router ---
+    data_devolucao: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    quilometragem_inicial: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    quilometragem_final: Mapped[int | None] = mapped_column(Integer, nullable=True)
     
     # Relacionamentos
     veiculo: Mapped["Veiculo"] = relationship(back_populates="reservas")

@@ -4,59 +4,61 @@ from sqlalchemy import func
 from datetime import datetime, timedelta
 
 from ..database import get_db
-
+# --- CORREÇÃO DE IMPORTS ---
 from ..models.models import Veiculo                
-from ..models.Cliente import Cliente               
-from ..models.Reservar import Reserva               
+from ..models.Cliente import ClienteResponse               
+from ..models.Reservar import Reserva # O Modelo Correto
 from ..models.Veiculos import StatusVeiculo, StatusLocacao 
+from ..models.Adm import Admin # Para type hint
+from ..Schemas.Dashboard import DashboardStats # O Schema Correto
+from ..utils.dependencies import get_current_admin_user # A dependência Correta
+# ---------------------------
 
-from .Cliente import DashboardStats
-from .autenticacao import get_current_admin_user
-
-router = APIRouter()
+router = APIRouter(
+    prefix="/dashboard",
+    tags=["Dashboard"]
+)
 
 @router.get("/stats", 
     response_model=DashboardStats,
-    summary="Estatísticas do Dashboard",
-    description="""
-    Retorna as estatísticas completas do sistema para o dashboard administrativo.
-    
-    Inclui:
-    - Total de veículos e status (disponíveis, em manutenção, locados)
-    - Clientes ativos
-    - Locações ativas
-    - Faturamento mensal e total
-    """
+    summary="Estatísticas do Dashboard (Admin)",
+    description="Retorna as estatísticas do sistema. Requer Admin."
 )
 def obter_estatisticas(
     db: Session = Depends(get_db),
-    admin_user = Depends(get_current_admin_user)
+    admin_user: Admin = Depends(get_current_admin_user) # Protegido
 ):
-    """
-    Obtém estatísticas completas do sistema para o dashboard administrativo.
-    Requer autenticação como administrador.
-    """
     try:
-        # Estatísticas de Veículos
+        # Estatísticas de Veículos (nomes de coluna corretos)
         total_veiculos = db.query(Veiculo).count()
-        
         veiculos_disponiveis = db.query(Veiculo).filter(
-            Veiculo.Vei_status == StatusVeiculo.DISPONIVEL # CORREÇÃO: Vei_status (como em models.py)
+            Veiculo.status == StatusVeiculo.DISPONIVEL
         ).count()
-        
         veiculos_manutencao = db.query(Veiculo).filter(
-            Veiculo.Vei_status == StatusVeiculo.MANUTENCAO # CORREÇÃO: Vei_status
+            Veiculo.status == StatusVeiculo.MANUTENCAO
         ).count()
-        
         veiculos_locados = db.query(Veiculo).filter(
-            Veiculo.Vei_status == StatusVeiculo.LOCADO # CORREÇÃO: Vei_status
+            Veiculo.status == StatusVeiculo.LOCADO
         ).count()
         
-        total_clientes = db.query(Cliente).filter(Cliente.cli_ativo == True).count() # CORREÇÃO: cli_ativo
+        # Clientes
+        total_clientes = db.query(Cliente).filter(Cliente.cli_ativo == True).count()
         
+        # "Usuários ativos" (Locações ativas)
         locacoes_ativas = db.query(Reserva).filter(
-            Reserva.res_status == StatusLocacao.ATIVA # Usando os campos de Reservar.py
+            Reserva.res_status == StatusLocacao.ATIVA
         ).count()
+        
+        # Faturamento
+        inicio_mes = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        faturamento_mensal = db.query(func.sum(Reserva.res_total)).filter(
+            Reserva.res_status == StatusLocacao.FINALIZADA,
+            Reserva.res_data_fim >= inicio_mes 
+        ).scalar() or 0.0
+        
+        faturamento_total = db.query(func.sum(Reserva.res_total)).filter(
+            Reserva.res_status == StatusLocacao.FINALIZADA
+        ).scalar() or 0.0
         
         return DashboardStats(
             total_veiculos=total_veiculos,
@@ -65,11 +67,13 @@ def obter_estatisticas(
             veiculos_locados=veiculos_locados,
             total_clientes=total_clientes,
             locacoes_ativas=locacoes_ativas,
+
         )
         
     except Exception as e:
+        # Logar o erro real no seu console
+        print(f"Erro no Dashboard: {e}")
         raise HTTPException(
             status_code=500, 
-            detail=f"Erro ao obter estatísticas do dashboard: {str(e)}"
+            detail="Erro ao obter estatísticas do dashboard."
         )
-}

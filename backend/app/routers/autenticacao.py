@@ -1,15 +1,11 @@
-# app/routers/autenticacao.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm 
 
 from ..database import get_db
-# Importe os serviços, como seu colega faz
-from Services import auth_service 
-# Importe os schemas (Pydantic models)
-from ..models.Cliente import UsuarioCreate, UsuarioResponse
-from ..schemas.token import Token
-# Importe as utils
+from ..Services import auth_service 
+from ..Schemas.Usuario import UsuarioCreate, UsuarioResponse 
+from ..Schemas.Token import Token 
 from ..utils.security import criar_access_token
 
 # --- Rota de Autenticação de Cliente ---
@@ -21,26 +17,24 @@ cliente_auth_router = APIRouter(
 @cliente_auth_router.post("/registrar", 
     response_model=UsuarioResponse, 
     status_code=status.HTTP_201_CREATED,
-    summary="Registrar novo cliente"
+    summary="Registrar novo cliente (Cliente se registra)"
 )
 def registrar_cliente(
-    usuario: UsuarioCreate,
+    usuario: UsuarioCreate, # Usa o Schema de auto-registro
     db: Session = Depends(get_db)
 ):
     """Cria uma nova conta de usuário como cliente."""
-    # Chama o serviço, assim como seu colega
     return auth_service.criar_novo_usuario(db, usuario)
 
 @cliente_auth_router.post("/login", 
     response_model=Token,
-    summary="Login de cliente"
+    summary="Login de cliente (Cliente loga)"
 )
 def login_cliente(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    """Autentica cliente e retorna token JWT."""
-    # Chama o serviço
+    """Autentica cliente (username=email) e retorna token JWT."""
     usuario = auth_service.autenticar_usuario(
         db, form_data.username, form_data.password
     )
@@ -67,14 +61,14 @@ admin_auth_router = APIRouter(
 
 @admin_auth_router.post("/login", 
     response_model=Token,
-    summary="Login de administrador"
+    summary="Login de administrador (Admin loga)"
 )
 def login_admin(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     """
-    Autentica administrador (usando 'adm_codigo' como username) 
+    Autentica administrador (username=adm_codigo) 
     e retorna token JWT.
     """
     admin = auth_service.autenticar_admin(
@@ -89,7 +83,7 @@ def login_admin(
         )
     
     access_token = criar_access_token(
-        data={"sub": admin.adm_codigo, "role": "admin"}
+        data={"sub": admin.codigo_admin, "role": "admin"} # CORREÇÃO: Usar o campo correto do modelo Admin
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
