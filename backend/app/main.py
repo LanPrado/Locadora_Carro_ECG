@@ -7,20 +7,15 @@ from pathlib import Path
 
 from .database import engine, Base, SessionLocal
 
-# Isto é essencial para Base.metadata.create_all() funcionar
 from .models.models import Veiculo
-from .models.Cliente import ClienteResponse, ClienteCreate
+from .models.Cliente import Cliente
 from .models.Reservar import Reserva
 from .models.Adm import Admin
+from .models.Veiculos import CategoriaVeiculo, StatusVeiculo
 
-
-from .routers import autenticacao, Veiculos, Dashboard
-# Renomeie seus arquivos:
-# 'Cliente.py' -> 'clientes.py'
-# 'Reservar.py' -> 'reservas.py'
-from .routers import Clientes as router_clientes
-from .routers import Reservas as router_reservas
-# 
+from .routers import autenticacao, veiculos, dashboard
+from .routers import clientes as router_clientes
+from .routers import reservas as router_reservas
 
 # Criar tabelas
 try:
@@ -37,15 +32,16 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configurar CORS
+# ... (Middleware CORS) ...
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Em produção, mude para o seu frontend
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Montar diretório estático
+
+# ... (Static files) ...
 static_dir = Path(__file__).parent / "static" 
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
@@ -53,11 +49,10 @@ if static_dir.exists():
 # --- CORREÇÃO: Incluir os routers com prefixo /api ---
 app.include_router(autenticacao.cliente_auth_router, prefix="/api", tags=["Autenticação"])
 app.include_router(autenticacao.admin_auth_router, prefix="/api", tags=["Autenticação"])
-app.include_router(Veiculos.router, prefix="/api/veiculos", tags=["Veículos"])
+app.include_router(veiculos.router, prefix="/api/veiculos", tags=["Veículos"])
 app.include_router(router_clientes.router, prefix="/api/clientes", tags=["Clientes (Admin)"])
 app.include_router(router_reservas.router, prefix="/api/reservas", tags=["Reservas/Locações"])
-app.include_router(Dashboard.router, prefix="/api/dashboard", tags=["Dashboard (Admin)"])
-
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard (Admin)"])
 @app.get("/", include_in_schema=False)
 async def root():
     html_file_path = Path(__file__).parent / "static" / "apresentacao.html"
@@ -69,4 +64,3 @@ async def root():
         "docs": "/docs"
     }
 
-# (O middleware de sessão de DB não precisa de mudanças)

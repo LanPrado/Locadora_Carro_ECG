@@ -3,9 +3,12 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 import uuid
-from models import Veiculo, Cliente
+
 from app.database import Base 
 from .Veiculos import StatusLocacao
+# --- CORREÇÃO AQUI ---
+from .Cliente import Cliente
+from .models import Veiculo
 
 class Reserva(Base):
     __tablename__ = "reservas"
@@ -14,14 +17,13 @@ class Reserva(Base):
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     
-    # Chaves estrangeiras
+    # Chaves estrangeiras (Corrigidas na minha resposta anterior)
     res_vei_id: Mapped[str] = mapped_column(
-        ForeignKey("veiculos.id"), nullable=False, index=True # CORREÇÃO: Aponta para veiculos.id
+        ForeignKey("veiculos.id"), nullable=False, index=True
     )
     res_cli_id: Mapped[str] = mapped_column(
         ForeignKey("clientes.cli_id"), nullable=False, index=True
     )
-    
     # Campos da reserva/locação
     res_data_inicio: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
