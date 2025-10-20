@@ -3,16 +3,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
 
-from ..database import get_db
-# --- CORREÇÃO DE IMPORTS ---
-from ..models.models import Veiculo                
-from ..models.Cliente import ClienteResponse               
-from ..models.Reservar import Reserva # O Modelo Correto
-from ..models.Veiculos import StatusVeiculo, StatusLocacao 
-from ..models.Adm import Admin # Para type hint
-from ..Schemas.Dashboard import DashboardStats # O Schema Correto
-from ..utils.dependencies import get_current_admin_user
-from backend.app.models import Cliente # A dependência Correta
+from app.database import get_db  
+from app.models.Veiculos import Veiculo, StatusVeiculo, StatusLocacao             
+from app.models.Cliente import Cliente              
+from app.models.Reservar import Reserva
+from app.models.Adm import Admin  
+from app.Schemas.Dashboard import DashboardStats  
+from app.utils.dependencies import get_current_admin_user 
 
 router = APIRouter(
     prefix="/dashboard",
@@ -67,7 +64,8 @@ def obter_estatisticas(
             veiculos_locados=veiculos_locados,
             total_clientes=total_clientes,
             locacoes_ativas=locacoes_ativas,
-
+            faturamento_mensal=float(faturamento_mensal),  # ADICIONADO
+            faturamento_total=float(faturamento_total)     # ADICIONADO
         )
         
     except Exception as e:

@@ -1,18 +1,34 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 from ..models.Veiculos import CategoriaVeiculo, StatusVeiculo
 
-# Schema para criar/atualizar um veículo
+# Schema para criar um veículo
 class VeiculoCreate(BaseModel):
     placa: str
     modelo: str
     marca: str
     ano: int
+    cor: str
     categoria: CategoriaVeiculo
-    diaria: float
+    valor_diaria: float  # Mudei de 'diaria' para 'valor_diaria'
     descricao: Optional[str] = None
-    imagem_url: Optional[str] = None
-    status: Optional[StatusVeiculo] = StatusVeiculo.DISPONIVEL
+
+    class Config:
+        from_attributes = True
+        use_enum_values = True
+
+# Schema para atualizar um veículo
+class VeiculoUpdate(BaseModel):
+    placa: Optional[str] = None
+    modelo: Optional[str] = None
+    marca: Optional[str] = None
+    ano: Optional[int] = None
+    cor: Optional[str] = None
+    categoria: Optional[CategoriaVeiculo] = None
+    valor_diaria: Optional[float] = None
+    status: Optional[StatusVeiculo] = None
+    descricao: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -26,10 +42,12 @@ class VeiculoResponse(BaseModel):
     marca: str
     ano: int
     categoria: CategoriaVeiculo
-    diaria: float
+    valor_diaria: float  # Mudei de 'diaria' para 'valor_diaria'
     status: StatusVeiculo
     descricao: Optional[str] = None
-    #imagem_url: Optional[str] = None
+    ativo: bool
+    criado_em: datetime
+    atualizado_em: datetime
 
     class Config:
         from_attributes = True

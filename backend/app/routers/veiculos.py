@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from ..database import get_db
-from ..models.models import Veiculo
-from ..models.Veiculos import StatusVeiculo, CategoriaVeiculo
-from ..models.Adm import Admin # Para type hint da dependência
+from app.database import get_db  # CORRIGIDO
+from app.models.Veiculos import Veiculo, StatusVeiculo, CategoriaVeiculo  # CORRIGIDO
+from app.models.Adm import Admin  # CORRIGIDO
 
-from Schemas.Veiculos import VeiculoCreate, VeiculoResponse 
-from ..utils.dependencies import get_current_admin_user 
+from app.Schemas.Veiculos import VeiculoCreate, VeiculoResponse  # CORRIGIDO
+from app.utils.dependencies import get_current_admin_user  # CORRIGIDO
 from enum import Enum
 
 router = APIRouter()
@@ -65,7 +64,7 @@ def listar_veiculos(
         raise HTTPException(status_code=500, detail=f"Erro interno do servidor: {str(e)}")
 
 @router.get("/{veiculo_id}", response_model=VeiculoResponse, summary="Obter um veículo (Público/Cliente)")
-def obter_veiculo(veiculo_id: str, db: Session = Depends(get_db)): # CORREÇÃO: ID é string (UUID)
+def obter_veiculo(veiculo_id: str, db: Session = Depends(get_db)):
     veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not veiculo:
         raise HTTPException(status_code=404, detail="Veículo não encontrado")
@@ -76,7 +75,7 @@ def atualizar_veiculo(
     veiculo_id: str, 
     veiculo: VeiculoCreate,
     db: Session = Depends(get_db),
-    usuario_admin: Admin = Depends(get_current_admin_user) # Protegido
+    usuario_admin: Admin = Depends(get_current_admin_user)
 ):
     db_veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not db_veiculo:
@@ -98,10 +97,10 @@ def atualizar_veiculo(
 
 @router.patch("/{veiculo_id}/status", response_model=VeiculoResponse, summary="Alterar status do veículo (Admin)")
 def alterar_status_veiculo(
-    veiculo_id: str, # CORREÇÃO: ID é string (UUID)
+    veiculo_id: str,
     status: StatusFilter,
     db: Session = Depends(get_db),
-    usuario_admin: Admin = Depends(get_current_admin_user) # Protegido
+    usuario_admin: Admin = Depends(get_current_admin_user)
 ):
     db_veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not db_veiculo:
@@ -116,9 +115,9 @@ def alterar_status_veiculo(
 
 @router.delete("/{veiculo_id}", summary="Deletar veículo (Admin)")
 def deletar_veiculo(
-    veiculo_id: str, # CORREÇÃO: ID é string (UUID)
+    veiculo_id: str,
     db: Session = Depends(get_db),
-    usuario_admin: Admin = Depends(get_current_admin_user) # Protegido
+    usuario_admin: Admin = Depends(get_current_admin_user)
 ):
     veiculo = db.query(Veiculo).filter(Veiculo.id == veiculo_id).first()
     if not veiculo:

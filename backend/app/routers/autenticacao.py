@@ -6,9 +6,10 @@ from ..database import get_db
 from ..Services import auth_service 
 from ..Schemas.Usuario import UsuarioCreate, UsuarioResponse 
 from ..Schemas.Token import Token 
-from ..utils.security import criar_access_token
+from ..utils.security import criar_access_token, criar_hash_senha
+from app.Schemas.Admin import AdminCreate, AdminResponse  
+from app.models.Adm import Admin  
 
-# --- Rota de Autenticação de Cliente ---
 cliente_auth_router = APIRouter(
     prefix="/auth/cliente",
     tags=["Autenticação de Cliente"]
@@ -54,10 +55,51 @@ def login_cliente(
 
 
 # --- Rota de Autenticação de Admin ---
+
 admin_auth_router = APIRouter(
     prefix="/auth/admin",
     tags=["Autenticação de Admin"]
 )
+
+@admin_auth_router.post("/registrar", 
+    response_model=AdminResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Registrar novo administrador",
+    description="Cria uma nova conta de administrador (apenas para desenvolvimento)"
+)
+def registrar_admin(
+    admin: AdminCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Registra um novo administrador no sistema.
+    Código deve estar no formato: ADM000001 (ADM + 6 dígitos)
+    Níveis de acesso: operador, supervisor, super
+    """
+    # Verificar se o código já existe
+    admin_existente = db.query(Admin).filter(Admin.codigo_admin == admin.codigo_admin).first()
+    if admin_existente:
+        raise HTTPException(
+            status_code=400,
+            detail="Código de administrador já existe"
+        )
+    
+    # Criar hash da senha
+    senha_hash = criar_hash_senha(admin.senha)
+    
+    # Criar novo admin
+    novo_admin = Admin(
+        codigo_admin=admin.codigo_admin,
+        adm_nome=admin.adm_nome,
+        senha_hash=senha_hash,
+        nivel_acesso=admin.nivel_acesso
+    )
+    
+    db.add(novo_admin)
+    db.commit()
+    db.refresh(novo_admin)
+    
+    return novo_admin
 
 @admin_auth_router.post("/login", 
     response_model=Token,

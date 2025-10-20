@@ -4,13 +4,12 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse 
 from pathlib import Path
 
-from .database import engine, Base
-from .models import base as models
+from app.database import engine, Base
 
-#routers 
-from .routers import autenticacao, veiculos, dashboard
-from .routers import clientes as router_clientes
-from .routers import reservas as router_reservas
+# routers 
+from app.routers import autenticacao, Veiculos as veiculos , Dashboard as dashboard
+from app.routers import Cliente as router_cliente
+from app.routers import Reservar as router_reservar
 
 # Criar tabelas
 try:
@@ -32,15 +31,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 static_dir = Path(__file__).parent / "static" 
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
 app.include_router(autenticacao.cliente_auth_router, prefix="/api", tags=["Autenticação"])
 app.include_router(autenticacao.admin_auth_router, prefix="/api", tags=["Autenticação"])
 app.include_router(veiculos.router, prefix="/api/veiculos", tags=["Veículos"])
-app.include_router(router_clientes.router, prefix="/api/clientes", tags=["Clientes (Admin)"])
-app.include_router(router_reservas.router, prefix="/api/reservas", tags=["Reservas/Locações"])
+app.include_router(router_cliente.router, prefix="/api/clientes", tags=["Clientes (Admin)"])
+app.include_router(router_reservar.router, prefix="/api/reservas", tags=["Reservas/Locações"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard (Admin)"])
 
 @app.get("/", include_in_schema=False)
@@ -49,3 +48,8 @@ async def root():
     if html_file_path.exists():
         return FileResponse(html_file_path)
     return {"message": "Bem-vindo à API da Locadora"}
+
+@app.get("/Funcionando")
+async def health_check():
+    return {"status": "Locadora", "message": "API está funcionando"}
+

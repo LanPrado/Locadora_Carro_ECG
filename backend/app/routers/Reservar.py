@@ -3,14 +3,13 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 
-from ..database import get_db
-from ..models.models import Veiculo
-from ..models.Cliente import Cliente, ClienteResponse, ClienteCreate
-from ..models.Veiculos import StatusLocacao, StatusVeiculo
-from ..models.Reservar import Reserva
-from ..models.Adm import Admin
-from ..Schemas.Reservar import LocacaoResponse, ReservaRequest, MudarStatusRequest
-from ..utils.dependencies import get_current_cliente_user, get_current_admin_user
+from app.database import get_db  
+from app.models.Veiculos import Veiculo, StatusLocacao, StatusVeiculo  
+from app.models.Cliente import Cliente  
+from app.models.Reservar import Reserva  
+from app.models.Adm import Admin  
+from app.Schemas.Reservar import LocacaoResponse, ReservaRequest, MudarStatusRequest 
+from app.utils.dependencies import get_current_cliente_user, get_current_admin_user  
 
 router = APIRouter()
 
@@ -45,7 +44,7 @@ def reservar_veiculo(
     if dias_locacao <= 0:
         raise HTTPException(status_code=400, detail="Período de locação inválido")
     
-    valor_total = dias_locacao * veiculo.diaria
+    valor_total = dias_locacao * veiculo.valor_diaria  # CORRIGIDO: veiculo.diaria para veiculo.valor_diaria
     
     nova_reserva = Reserva(
         res_cli_id=current_user.cli_id,
