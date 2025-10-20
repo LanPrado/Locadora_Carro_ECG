@@ -3,10 +3,10 @@ from typing import Optional
 
 # Schema para registro de admin
 class AdminCreate(BaseModel):
-    codigo_admin: str = Field(..., regex=r'^ADM\d{6}$')  # Formato: ADM + 6 dígitos
+    codigo_admin: str = Field(..., pattern=r'^ADM\d{6}$') 
     adm_nome: str
     senha: str
-    nivel_acesso: Optional[str] = "operador"  # operador, supervisor, super
+    nivel_acesso: Optional[str] = "operador"  
 
     class Config:
         from_attributes = True

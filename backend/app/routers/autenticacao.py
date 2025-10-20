@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm 
+from pydantic import BaseModel  
 
 from ..database import get_db
 from ..Services import auth_service 
@@ -9,6 +9,14 @@ from ..Schemas.Token import Token
 from ..utils.security import criar_access_token, criar_hash_senha
 from app.Schemas.Admin import AdminCreate, AdminResponse  
 from app.models.Adm import Admin  
+
+class AdminLoginRequest(BaseModel):
+    codigo_admin: str
+    senha: str
+
+class ClienteLoginRequest(BaseModel):
+    email: str
+    senha: str
 
 cliente_auth_router = APIRouter(
     prefix="/auth/cliente",
@@ -21,7 +29,7 @@ cliente_auth_router = APIRouter(
     summary="Registrar novo cliente (Cliente se registra)"
 )
 def registrar_cliente(
-    usuario: UsuarioCreate, # Usa o Schema de auto-registro
+    usuario: UsuarioCreate,
     db: Session = Depends(get_db)
 ):
     """Cria uma nova conta de usuário como cliente."""
@@ -32,12 +40,12 @@ def registrar_cliente(
     summary="Login de cliente (Cliente loga)"
 )
 def login_cliente(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    login_data: ClienteLoginRequest,  # TROQUE AQUI
     db: Session = Depends(get_db)
 ):
-    """Autentica cliente (username=email) e retorna token JWT."""
+    """Autentica cliente (email) e retorna token JWT."""
     usuario = auth_service.autenticar_usuario(
-        db, form_data.username, form_data.password
+        db, login_data.email, login_data.senha  # TROQUE AQUI
     )
     
     if usuario is None:
@@ -53,9 +61,7 @@ def login_cliente(
     
     return {"access_token": access_token, "token_type": "bearer"}
 
-
-# --- Rota de Autenticação de Admin ---
-
+# Rota de Autenticação de Admin 
 admin_auth_router = APIRouter(
     prefix="/auth/admin",
     tags=["Autenticação de Admin"]
@@ -71,12 +77,7 @@ def registrar_admin(
     admin: AdminCreate,
     db: Session = Depends(get_db)
 ):
-    """
-    Registra um novo administrador no sistema.
-    Código deve estar no formato: ADM000001 (ADM + 6 dígitos)
-    Níveis de acesso: operador, supervisor, super
-    """
-    # Verificar se o código já existe
+   
     admin_existente = db.query(Admin).filter(Admin.codigo_admin == admin.codigo_admin).first()
     if admin_existente:
         raise HTTPException(
@@ -84,10 +85,8 @@ def registrar_admin(
             detail="Código de administrador já existe"
         )
     
-    # Criar hash da senha
     senha_hash = criar_hash_senha(admin.senha)
     
-    # Criar novo admin
     novo_admin = Admin(
         codigo_admin=admin.codigo_admin,
         adm_nome=admin.adm_nome,
@@ -106,15 +105,12 @@ def registrar_admin(
     summary="Login de administrador (Admin loga)"
 )
 def login_admin(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    login_data: AdminLoginRequest,  # TROQUE AQUI
     db: Session = Depends(get_db)
 ):
-    """
-    Autentica administrador (username=adm_codigo) 
-    e retorna token JWT.
-    """
+    """Autentica administrador (código_admin) e retorna token JWT."""
     admin = auth_service.autenticar_admin(
-        db, form_data.username, form_data.password
+        db, login_data.codigo_admin, login_data.senha  # TROQUE AQUI
     )
     
     if admin is None:
@@ -125,7 +121,7 @@ def login_admin(
         )
     
     access_token = criar_access_token(
-        data={"sub": admin.codigo_admin, "role": "admin"} # CORREÇÃO: Usar o campo correto do modelo Admin
+        data={"sub": admin.codigo_admin, "role": "admin"}
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
