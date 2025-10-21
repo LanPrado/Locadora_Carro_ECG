@@ -8,9 +8,9 @@ from typing import Optional
 # Importe seus modelos e schemas
 from ..models.Cliente import Cliente as Usuario
 from ..models.Adm import Admin as UsuarioAdmin
-from ..Schemas.Usuario import UsuarioCreate  # Corrigido o caminho
+from ..Schemas.Usuario import UsuarioCreate  
 
-# Importe suas funções de segurança
+# funções de segurança
 from ..utils.security import (
     criar_hash_senha, 
     verificar_senha, 

@@ -2,7 +2,7 @@ FROM python:3.12
 
 WORKDIR /app
 
-# Copia e instala as dependências primeiro para aproveitar o cache do Docker
+# Copia e instala as dependências primeiro
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

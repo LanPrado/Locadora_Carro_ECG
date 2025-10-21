@@ -44,7 +44,7 @@ def reservar_veiculo(
     if dias_locacao <= 0:
         raise HTTPException(status_code=400, detail="Período de locação inválido")
     
-    valor_total = dias_locacao * veiculo.valor_diaria  # CORRIGIDO: veiculo.diaria para veiculo.valor_diaria
+    valor_total = dias_locacao * veiculo.valor_diaria 
     
     nova_reserva = Reserva(
         res_cli_id=current_user.cli_id,
@@ -108,7 +108,6 @@ def alterar_status_locacao(
         veiculo.status = StatusVeiculo.DISPONIVEL
         if novo_status == StatusLocacao.FINALIZADA:
             reserva.data_devolucao = datetime.utcnow()
-            # Opcional: Lógica de multa pode ser adicionada aqui
 
     db.commit()
     db.refresh(reserva)

@@ -64,8 +64,8 @@ def obter_estatisticas(
             veiculos_locados=veiculos_locados,
             total_clientes=total_clientes,
             locacoes_ativas=locacoes_ativas,
-            faturamento_mensal=float(faturamento_mensal),  # ADICIONADO
-            faturamento_total=float(faturamento_total)     # ADICIONADO
+            faturamento_mensal=float(faturamento_mensal),  
+            faturamento_total=float(faturamento_total)     
         )
         
     except Exception as e:

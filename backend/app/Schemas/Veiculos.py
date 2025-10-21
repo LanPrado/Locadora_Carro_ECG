@@ -11,7 +11,7 @@ class VeiculoCreate(BaseModel):
     ano: int
     cor: str
     categoria: CategoriaVeiculo
-    valor_diaria: float  # Mudei de 'diaria' para 'valor_diaria'
+    valor_diaria: float 
     descricao: Optional[str] = None
 
     class Config:
@@ -42,7 +42,7 @@ class VeiculoResponse(BaseModel):
     marca: str
     ano: int
     categoria: CategoriaVeiculo
-    valor_diaria: float  # Mudei de 'diaria' para 'valor_diaria'
+    valor_diaria: float  
     status: StatusVeiculo
     descricao: Optional[str] = None
     ativo: bool

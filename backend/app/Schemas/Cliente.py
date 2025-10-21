@@ -2,11 +2,10 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
-# Schema para Admins criarem clientes (usado em routers/clientes.py)
 class ClienteCreate(BaseModel):
     cli_email: EmailStr
     cli_nome: str
-    cli_senha_hash: str # Admin define o hash
+    cli_senha_hash: str 
     cli_telefone: Optional[str] = None
     cli_cpf: Optional[str] = None
 
