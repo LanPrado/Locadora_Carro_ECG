@@ -1,4 +1,3 @@
-# app/services/auth_service.py
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
