@@ -23,10 +23,8 @@ class Veiculo(Base):
     descricao = Column(String(255), nullable=True)
     atualizado_em = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # O relacionamento agora pode referenciar a classe diretamente
     reservas = relationship("Reserva", back_populates="veiculo")
 
-# --- Modelo Cliente ---
 class Cliente(Base):
     __tablename__ = "clientes"
     
@@ -46,7 +44,6 @@ class Cliente(Base):
 
     reservas: Mapped[list["Reserva"]] = relationship(back_populates="cliente")
 
-# --- Modelo Reserva ---
 class Reserva(Base):
     __tablename__ = "reservas"
     
@@ -62,7 +59,6 @@ class Reserva(Base):
     veiculo: Mapped["Veiculo"] = relationship(back_populates="reservas")
     cliente: Mapped["Cliente"] = relationship(back_populates="reservas")
 
-# --- Modelo Admin ---
 class Admin(Base):
     __tablename__ = "admins"
     

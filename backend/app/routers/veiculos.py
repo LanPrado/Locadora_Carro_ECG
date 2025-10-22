@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.database import get_db  # CORRIGIDO
-from app.models.Veiculos import Veiculo, StatusVeiculo, CategoriaVeiculo  # CORRIGIDO
-from app.models.Adm import Admin  # CORRIGIDO
+from app.database import get_db  
+from app.models.Veiculos import Veiculo, StatusVeiculo, CategoriaVeiculo  
+from app.models.Adm import Admin 
 
-from app.Schemas.Veiculos import VeiculoCreate, VeiculoResponse  # CORRIGIDO
-from app.utils.dependencies import get_current_admin_user  # CORRIGIDO
+from app.Schemas.Veiculos import VeiculoCreate, VeiculoResponse  
+from app.utils.dependencies import get_current_admin_user  
 from enum import Enum
 
 router = APIRouter()

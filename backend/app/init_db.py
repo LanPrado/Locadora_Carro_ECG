@@ -3,7 +3,7 @@ import sys
 sys.path.append('/app')
 
 from sqlalchemy import create_engine
-from backend.app.models.models import Base
+from backend.app.models.Base import Base
 
 # Adicionar o caminho para encontrar o database.py
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))

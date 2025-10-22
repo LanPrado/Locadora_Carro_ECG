@@ -13,6 +13,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/cliente/login")
 
 # Dependência para obter usuário (Cliente) atual
 def get_current_cliente_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Cliente:
+    
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Não foi possível validar as credenciais",
@@ -46,7 +48,6 @@ def get_current_admin_user(token: str = Depends(oauth2_scheme), db: Session = De
     if token_data is None:
         raise credentials_exception
     
-    # --- CORREÇÃO: Lógica de validação de Admin ---
     # 1. O token DEVE ter a role "admin"
     if token_data.get("role") != "admin":
         raise HTTPException(

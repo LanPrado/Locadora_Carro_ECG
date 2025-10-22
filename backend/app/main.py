@@ -14,9 +14,9 @@ from app.routers import Reservar as router_reservar
 # Criar tabelas
 try:
     Base.metadata.create_all(bind=engine)
-    print("✅ Tabelas verificadas/criadas com sucesso.")
+    print(" Tabelas verificadas/criadas com sucesso.")
 except Exception as e:
-    print(f"❌ Erro ao criar tabelas: {e}")
+    print(f" Erro ao criar tabelas: {e}")
    
 app = FastAPI(
     title="Locadora Veículos API",

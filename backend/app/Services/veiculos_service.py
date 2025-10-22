@@ -1,7 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.models import VeiculoCreate, Veiculo
-from app.models.models import VeiculoCreate, VeiculoUpdate, VeiculoResponse, VeiculoListResponse
+from app.models import Veiculos  
+from app.Schemas.Veiculos import VeiculoCreate, VeiculoUpdate, VeiculoResponse, VeiculoListResponse
 
 class VeiculoService:
     def __init__(self, db: Session):
@@ -10,8 +10,8 @@ class VeiculoService:
     def criar_veiculo(self, veiculo_data: VeiculoCreate) -> VeiculoResponse:
         """201 Created: O dado foi criado com sucesso"""
         # Verificar se placa já existe
-        veiculo_existente = self.db.query(Veiculo).filter(
-            Veiculo.placa == veiculo_data.placa.upper()
+        veiculo_existente = self.db.query(Veiculos).filter(
+            Veiculos.placa == veiculo_data.placa.upper()     
         ).first()
         
         if veiculo_existente:
@@ -19,22 +19,22 @@ class VeiculoService:
         
         # Verificar se descrição já existe (se fornecida)
         if veiculo_data.descricao:
-            descricao_existente = self.db.query(Veiculo).filter(
-                Veiculo.descricao == veiculo_data.descricao
+            descricao_existente = self.db.query(Veiculos).filter( 
+                Veiculos.descricao == veiculo_data.descricao       
             ).first()
             if descricao_existente:
                 raise ValueError("Já existe um veículo com esta descrição")
         
-        db_veiculo = Veiculo(**veiculo_data.model_dump())
+        db_veiculo = Veiculos(**veiculo_data.model_dump())  
         self.db.add(db_veiculo)
         self.db.commit()
         self.db.refresh(db_veiculo)
         
         return VeiculoResponse.model_validate(db_veiculo)
     
-    def buscar_veiculo_por_id(self, veiculo_id: int) -> Optional[VeiculoResponse]:  # ✅ Agora é int
+    def buscar_veiculo_por_id(self, veiculo_id: int) -> Optional[VeiculoResponse]:
         """200 OK: Deu tudo certo | 404 Not Found: Recurso não encontrado"""
-        db_veiculo = self.db.query(Veiculo).filter(Veiculo.vei_id == veiculo_id).first()
+        db_veiculo = self.db.query(Veiculos).filter(Veiculos.vei_id == veiculo_id).first()  
         
         if not db_veiculo:
             return None
@@ -43,8 +43,8 @@ class VeiculoService:
     
     def buscar_veiculo_por_placa(self, placa: str) -> Optional[VeiculoResponse]:
         """200 OK: Deu tudo certo | 404 Not Found: Recurso não encontrado"""
-        db_veiculo = self.db.query(Veiculo).filter(
-            Veiculo.placa == placa.upper()
+        db_veiculo = self.db.query(Veiculos).filter(  
+            Veiculos.placa == placa.upper()           
         ).first()
         
         if not db_veiculo:
@@ -54,8 +54,8 @@ class VeiculoService:
     
     def listar_veiculos(self, skip: int = 0, limit: int = 100) -> VeiculoListResponse:
         """200 OK: Deu tudo certo"""
-        veiculos = self.db.query(Veiculo).offset(skip).limit(limit).all()
-        total = self.db.query(Veiculo).count()
+        veiculos = self.db.query(Veiculos).offset(skip).limit(limit).all()  
+        total = self.db.query(Veiculos).count()  
         
         return VeiculoListResponse(
             veiculos=[VeiculoResponse.model_validate(v) for v in veiculos],
@@ -66,12 +66,12 @@ class VeiculoService:
     
     def listar_veiculos_ativos(self, skip: int = 0, limit: int = 100) -> VeiculoListResponse:
         """200 OK: Deu tudo certo"""
-        veiculos = self.db.query(Veiculo).filter(
-            Veiculo.ativo == True
+        veiculos = self.db.query(Veiculos).filter(  
+            Veiculos.ativo == True                 
         ).offset(skip).limit(limit).all()
         
-        total_ativos = self.db.query(Veiculo).filter(
-            Veiculo.ativo == True
+        total_ativos = self.db.query(Veiculos).filter(  
+            Veiculos.ativo == True                      
         ).count()
         
         return VeiculoListResponse(
@@ -83,12 +83,12 @@ class VeiculoService:
     
     def listar_veiculos_por_cliente(self, cli_id: str, skip: int = 0, limit: int = 100) -> VeiculoListResponse:
         """200 OK: Deu tudo certo"""
-        veiculos = self.db.query(Veiculo).filter(
-            Veiculo.cli_id == cli_id
+        veiculos = self.db.query(Veiculos).filter(  # ✅ Corrigido: Veiculos
+            Veiculos.cli_id == cli_id               # ✅ Corrigido: Veiculos
         ).offset(skip).limit(limit).all()
         
-        total_cliente = self.db.query(Veiculo).filter(
-            Veiculo.cli_id == cli_id
+        total_cliente = self.db.query(Veiculos).filter(  # ✅ Corrigido: Veiculos
+            Veiculos.cli_id == cli_id                    # ✅ Corrigido: Veiculos
         ).count()
         
         return VeiculoListResponse(
@@ -98,18 +98,18 @@ class VeiculoService:
             por_pagina=limit
         )
     
-    def atualizar_veiculo(self, veiculo_id: int, veiculo_update: VeiculoUpdate) -> Optional[VeiculoResponse]:  # ✅ Agora é int
+    def atualizar_veiculo(self, veiculo_id: int, veiculo_update: VeiculoUpdate) -> Optional[VeiculoResponse]:
         """200 OK: Deu tudo certo | 404 Not Found: Recurso não encontrado"""
-        db_veiculo = self.db.query(Veiculo).filter(Veiculo.vei_id == veiculo_id).first()
+        db_veiculo = self.db.query(Veiculos).filter(Veiculos.vei_id == veiculo_id).first()  # ✅ Corrigido: Veiculos
         
         if not db_veiculo:
             return None
         
         # Verificar conflito de placa se estiver sendo atualizada
         if veiculo_update.placa:
-            veiculo_com_placa = self.db.query(Veiculo).filter(
-                Veiculo.placa == veiculo_update.placa.upper(),
-                Veiculo.vei_id != veiculo_id
+            veiculo_com_placa = self.db.query(Veiculos).filter(  
+                Veiculos.placa == veiculo_update.placa.upper(),  
+                Veiculos.vei_id != veiculo_id                    
             ).first()
             
             if veiculo_com_placa:
@@ -117,11 +117,11 @@ class VeiculoService:
         
         # Verificar conflito de descrição se estiver sendo atualizada
         if veiculo_update.descricao:
-            veiculo_com_descricao = self.db.query(Veiculo).filter(
-                Veiculo.descricao == veiculo_update.descricao,
-                Veiculo.vei_id != veiculo_id
+            veiculo_com_descricao = self.db.query(Veiculos).filter(  
+                Veiculos.descricao == veiculo_update.descricao,
+                Veiculos.vei_id != veiculo_id
             ).first()
-            
+
             if veiculo_com_descricao:
                 raise ValueError("Já existe outro veículo com esta descrição")
         
@@ -134,9 +134,9 @@ class VeiculoService:
         
         return VeiculoResponse.model_validate(db_veiculo)
     
-    def deletar_veiculo(self, veiculo_id: int) -> bool:  # ✅ Agora é int
+    def deletar_veiculo(self, veiculo_id: int) -> bool:
         """204 No Content: Deletado com sucesso | 404 Not Found: Recurso não encontrado"""
-        db_veiculo = self.db.query(Veiculo).filter(Veiculo.vei_id == veiculo_id).first()
+        db_veiculo = self.db.query(Veiculos).filter(Veiculos.vei_id == veiculo_id).first()  
         
         if not db_veiculo:
             return False
@@ -145,9 +145,9 @@ class VeiculoService:
         self.db.commit()
         return True
     
-    def desativar_veiculo(self, veiculo_id: int) -> Optional[VeiculoResponse]:  # ✅ Agora é int
+    def desativar_veiculo(self, veiculo_id: int) -> Optional[VeiculoResponse]:
         """200 OK: Deu tudo certo | 404 Not Found: Recurso não encontrado"""
-        db_veiculo = self.db.query(Veiculo).filter(Veiculo.vei_id == veiculo_id).first()
+        db_veiculo = self.db.query(Veiculos).filter(Veiculos.vei_id == veiculo_id).first()  
         
         if not db_veiculo:
             return None

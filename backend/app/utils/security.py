@@ -51,19 +51,11 @@ def verificar_token(token: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-# Funções para geração de ID único
-def extrair_sobrenome(nome_completo: str) -> str:
-    """Extrai o sobrenome do nome completo"""
-    partes = nome_completo.strip().split()
-    if len(partes) >= 2:
-        return partes[-1].lower()
-    return partes[0].lower() if partes else "user"
-
 
 def gerar_id_unico(sobrenome: str, db: Session, tentativa: int = 0) -> str:
     """Gera um ID único baseado no sobrenome"""
-    if tentativa > 5:  # Limite de tentativas para evitar loop infinito
-        # Fallback: gera ID aleatório
+    if tentativa > 5: 
+
         random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
         return f"user_{random_suffix}"
     
