@@ -6,7 +6,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from app.database import Base 
-from .Veiculos import StatusLocacao  # Agora importa do mesmo arquivo
+from .Veiculos import StatusLocacao 
 
 if TYPE_CHECKING:
     from .Cliente import Cliente

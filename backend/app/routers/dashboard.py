@@ -23,7 +23,7 @@ router = APIRouter(
 )
 def obter_estatisticas(
     db: Session = Depends(get_db),
-    admin_user: Admin = Depends(get_current_admin_user) # Protegido
+    admin_user: Admin = Depends(get_current_admin_user) 
 ):
     try:
         # Estatísticas de Veículos (nomes de coluna corretos)

@@ -40,12 +40,12 @@ def registrar_cliente(
     summary="Login de cliente (Cliente loga)"
 )
 def login_cliente(
-    login_data: ClienteLoginRequest,  # TROQUE AQUI
+    login_data: ClienteLoginRequest, 
     db: Session = Depends(get_db)
 ):
     """Autentica cliente (email) e retorna token JWT."""
     usuario = auth_service.autenticar_usuario(
-        db, login_data.email, login_data.senha  # TROQUE AQUI
+        db, login_data.email, login_data.senha  
     )
     
     if usuario is None:
@@ -105,12 +105,12 @@ def registrar_admin(
     summary="Login de administrador (Admin loga)"
 )
 def login_admin(
-    login_data: AdminLoginRequest,  # TROQUE AQUI
+    login_data: AdminLoginRequest, 
     db: Session = Depends(get_db)
 ):
     """Autentica administrador (código_admin) e retorna token JWT."""
     admin = auth_service.autenticar_admin(
-        db, login_data.codigo_admin, login_data.senha  # TROQUE AQUI
+        db, login_data.codigo_admin, login_data.senha  
     )
     
     if admin is None:

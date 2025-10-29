@@ -1,4 +1,3 @@
-# Mude o nome deste arquivo para 'clientes.py' (plural)
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -8,7 +7,6 @@ from ..models.Cliente import Cliente
 from ..models.Adm import Admin 
 from ..Schemas.Cliente import ClienteCreate, ClienteResponse 
 from ..utils.dependencies import get_current_admin_user 
-
 
 router = APIRouter()
 
@@ -46,7 +44,7 @@ def criar_cliente(
 )
 def listar_clientes(
     db: Session = Depends(get_db),
-    admin_user: Admin = Depends(get_current_admin_user) # Protegido
+    admin_user: Admin = Depends(get_current_admin_user) 
 ):
     return db.query(Cliente).filter(Cliente.cli_ativo == True).all()
 

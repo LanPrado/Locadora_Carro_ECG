@@ -7,7 +7,7 @@ from pathlib import Path
 from app.database import engine, Base
 
 # routers 
-from app.routers import autenticacao, Veiculos as veiculos , Dashboard as dashboard
+from app.routers import autenticacao, veiculos as veiculos , Dashboard as dashboard
 from app.routers import Cliente as router_cliente
 from app.routers import Reservar as router_reservar
 
